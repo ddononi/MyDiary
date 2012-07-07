@@ -1,0 +1,56 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="알람설정" >
+
+        <CheckBoxPreference
+            android:key="alarm"
+            android:defaultValue="true"
+            android:summary="시작시간이 되면 알람 설정"
+            android:title="알람설정" />
+
+        <ListPreference
+            android:dialogTitle="발생시간"
+            android:entries="@array/time_list_preference"
+            android:entryValues="@array/time_list_value_preference"
+            android:key="beforeAlarm"
+            android:summary="시작시간전 알람 발생설정"
+            android:title="알람시간" />
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="위치알람설정" >
+
+        <ListPreference
+            android:dialogTitle="발생간격"
+            android:entries="@array/place_list_preference"
+            android:entryValues="@array/place_list_value_preference"
+            android:key="placeAlarm"
+            android:summary="주변 반경에 들어오면 위치 알람 통보"
+            android:title="발생간격" />
+        
+    </PreferenceCategory>    
+
+    <PreferenceCategory android:title="알람방식설정" >
+
+        <CheckBoxPreference
+            android:key="sound"
+            android:defaultValue="true"
+            android:summary="알람이 발생하면 사운드로 알려줌"
+            android:title="소리알림" />
+
+        <CheckBoxPreference
+            android:key="vibration"
+            android:defaultValue="true"
+            android:summary="알람이 발생하면  진동으로 알려줌"
+            android:title="진동발생" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="버젼정보" >
+
+        <PreferenceScreen
+            android:key="version"
+            android:summary="다이어리 Ver 1.01b"
+            android:title="프로그램 버전" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

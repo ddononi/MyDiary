@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="kr.co.diary"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+    <!-- 지도를 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!--  위치 좌표를 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />    
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />    
+	<!-- 알람 설정을 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+	<!-- 녹음 설정을 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>	    
+	<!-- sdcard에 접근하기 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>	    	
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:label="@string/app_name"
+            android:name=".MyDiaryActivity" android:screenOrientation="portrait" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="MemoActivity"></activity>
+        <activity android:name="MemoListActivity"></activity>
+        <activity android:name="MemoAllListActivity"></activity>
+        <activity android:name="SettingActivity"></activity>
+        <activity android:name=".ScheduleListActivity"></activity>
+        <activity android:name=".WeatherActivity"></activity>
+		<!--  map -->        
+        <activity android:name=".map.MapActivity"></activity>
+        <activity android:name=".LoggingListActivity"></activity>
+
+        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".LoggingReceiver" />
+        <service android:name=".AlarmService"></service>     
+        
+        
+    </application>
+
+</manifest>

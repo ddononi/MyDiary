@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="400px"
+    android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+			android:textColor="#f7f3f7"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:textSize="18dp"
+            android:gravity="left"
+            android:layout_marginLeft="30px"
+            android:text="태그명" />
+		<LinearLayout
+			android:background="#5a9af7"
+		 	android:orientation="vertical"
+			android:layout_width="fill_parent"
+		    android:layout_marginLeft="20px"
+		    android:layout_marginRight="20px"	
+		    android:layout_marginBottom="20px"			
+			android:padding="1dp"
+		  	android:layout_height="1dp" />   
+		<EditText
+		    android:layout_width="fill_parent"
+		    android:hint=""
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="20px"
+		    android:layout_marginRight="20px"			    
+		    android:singleLine="true"
+		    android:inputType="text"
+		    android:id="@+id/title"
+		     />
+ 
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal" >
+			<CheckBox
+			    android:id="@+id/checkBox"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_marginLeft="20px"
+			    android:text="주변에 도착하면 알람" />	        
+		    </LinearLayout>     
+		
+		<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/add_myplace_btn"
+			android:textColor="#111111"
+			android:padding="10dp"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1"
+		    android:layout_marginLeft="20px"
+		    android:layout_marginRight="20px"				
+			android:shadowColor="#ffffff"
+			android:text="위치 저장"	
+		 />		       
+
+</LinearLayout>

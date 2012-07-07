@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bgboard" 
+    android:gravity="center_vertical|center_horizontal"  
+    android:orientation="vertical" >
+
+	<TextView 
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:textColor="#111111"
+		 android:text="날짜 : "
+		 android:paddingTop="7dp"
+		 android:paddingBottom="7dp"
+		 android:paddingLeft="40dp"
+		 android:shadowDx="1"
+		 android:shadowDy="1"
+		 android:shadowRadius="1"
+		 android:shadowColor="#333333"
+		 android:textAppearance="?android:attr/textAppearanceMediumInverse"
+		 android:background="@drawable/selector"
+		 android:id="@+id/date"
+	 />
+    <LinearLayout
+        android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/post_it"  
+	    android:orientation="vertical" 
+	   >  
+	    <EditText
+		    android:layout_width="fill_parent"
+		    android:layout_height="370px"
+		    android:layout_marginLeft="70px"
+		    android:layout_marginRight="30px"
+		    android:layout_marginTop="60px"
+		    android:background="#00000000"
+		    android:lines="6" 
+		    android:maxLines="6"
+		    android:inputType="textMultiLine"
+		    android:gravity="top" 
+		    android:hint="여기에 메모를 입력하세요."
+		    android:padding="10dp"
+		    android:id="@+id/memo"
+	        />
+	    <Button
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:background="@drawable/pencil"
+		    android:layout_marginRight="20px"
+		    android:layout_gravity="right"	
+		    android:id="@+id/save_btn"	    
+
+	        />	    
+    </LinearLayout>
+
+</LinearLayout>

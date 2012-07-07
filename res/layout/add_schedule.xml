@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:minWidth="280dip"
+  android:fadingEdge="none"
+  android:id="@+id/add_schedule_root"
+  >
+	<LinearLayout
+	  android:background="@color/normal"
+	  android:orientation="vertical"
+	  android:layout_width="fill_parent"
+	  android:layout_height="fill_parent">
+		 
+		<EditText
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/schedule"
+			android:layout_marginLeft="10px"
+			android:layout_marginRight="10px"
+			android:lines="2"
+			android:hint="여기에 일정을 입력하세요.."
+			android:gravity="top"
+			android:textColor="#111111"
+			android:padding="10dp"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1"
+			android:shadowColor="#ffffff"
+			android:text=""				
+		 />
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="시작시간"
+			android:textSize="16dip"
+			android:layout_marginLeft="10px"
+			android:layout_marginRight="10px"			
+			android:textColor="#ffffff"	
+			android:paddingLeft="5dp"
+		 />
+		<LinearLayout
+			android:background="#5a9af7"
+		 	android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:padding="dp"
+			android:layout_marginLeft="10px"
+			android:layout_marginRight="10px"			
+		  	android:layout_height="1dp" /> 	
+		<TimePicker
+			android:paddingTop="10px"
+		    android:id="@+id/s_time"
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="center_horizontal"
+		    android:paddingBottom="10px"
+	     />
+		
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="종료시간"
+			android:textSize="16dip"
+			android:layout_marginLeft="10px"
+			android:layout_marginRight="10px"			
+			android:textColor="#ffffff"		
+			android:paddingLeft="5dp"
+		 />
+		<LinearLayout
+			android:background="#5a9af7"
+		 	android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:padding="dp"
+			android:layout_marginLeft="10px"
+			android:layout_marginRight="10px"			
+		  	android:layout_height="1dp" /> 	
+		<TimePicker
+			android:paddingTop="10px"
+		    android:id="@+id/e_time"
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="center_horizontal"
+		    android:paddingBottom="10px"
+	     />
+
+		<LinearLayout
+		 	android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:gravity="center_vertical|center_horizontal"			
+		  	android:layout_height="wrap_content">
+		  	
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="fill_parent"
+				android:text="알람을 설정합니다."
+				android:textSize="16dip"
+				android:textColor="#ffffff"	
+				android:gravity="center_vertical"
+				android:layout_marginLeft="20px"
+				android:paddingLeft="5dp"
+			 />
+				    
+			<ToggleButton
+			    android:id="@+id/alarm"
+			    android:layout_width="wrap_content"
+			    android:layout_height="fill_parent"
+			    android:layout_marginLeft="10px"
+			    android:text="알람" />
+			</LinearLayout>
+	 
+		<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/add_schedule_btn"
+			android:textColor="#111111"
+			android:padding="10dp"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1"
+			android:shadowColor="#ffffff"
+			android:text="등록"	
+			android:onClick="mOnclick"
+	
+		 />		
+		  
+	</LinearLayout>
+	 
+</ScrollView>

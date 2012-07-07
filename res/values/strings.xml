@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, MyDiaryActivity!</string>
+    <string name="app_name">MyDiary</string>
+    
+    <string-array name="time_list_preference">
+        <item>10분전</item>
+        <item>5분전</item>
+        <item>3분전</item>
+    </string-array>
+    
+    <string-array name="time_list_value_preference">
+        <item>10</item>
+        <item>5</item>
+        <item>3</item>
+    </string-array>
+    
+    
+    <string-array name="place_list_preference">
+        <item>300m</item>
+        <item>200m</item>
+        <item>100m</item>
+        <item>50m</item>
+    </string-array>
+    
+    <string-array name="place_list_value_preference">
+        <item>300</item>
+        <item>200</item>
+        <item>100</item>
+        <item>50</item>
+    </string-array>  
+    
+	<string-array name="local_list">
+		<item>서울</item>
+		<item>경기</item>
+		<item>충북</item>
+		<item>충남</item>
+		<item>전남</item>
+		<item>전북</item>
+		<item>강원</item>
+		<item>경남</item>
+		<item>제주</item>
+	</string-array>    
+</resources>
