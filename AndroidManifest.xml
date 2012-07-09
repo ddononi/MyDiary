@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kr.co.diary"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="1.1" >
 
     <uses-sdk android:minSdkVersion="8" />
     <!-- 지도를 위한 퍼미션 -->
@@ -20,6 +20,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
+            android:theme="@android:style/Theme.NoTitleBar"
             android:label="@string/app_name"
             android:name=".MyDiaryActivity" android:screenOrientation="portrait" >
             <intent-filter >
@@ -27,15 +28,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="MemoActivity"></activity>
-        <activity android:name="MemoListActivity"></activity>
-        <activity android:name="MemoAllListActivity"></activity>
-        <activity android:name="SettingActivity"></activity>
-        <activity android:name=".ScheduleListActivity"></activity>
-        <activity android:name=".WeatherActivity"></activity>
+        <!--  메모 엑티비티 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MemoActivity"></activity>
+        <!--  메모 리스트 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MemoListActivity"></activity>
+        <!-- 전체 메모 리스트 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MemoAllListActivity"></activity>
+        <!--  설정 엑티비티 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="SettingActivity"></activity>
+        <!--  스케쥴 엑티비티 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar"  android:name=".ScheduleListActivity"></activity>
+        <!--  날씨 엑티비티  -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".WeatherActivity"></activity>
+        <!--  녹음 엑티비티 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".RecordListActivity"></activity>        
 		<!--  map -->        
-        <activity android:name=".map.MapActivity"></activity>
-        <activity android:name=".LoggingListActivity"></activity>
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".map.MapActivity"></activity>
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".LoggingListActivity"></activity>
 
         <receiver android:name=".AlarmReceiver" />
         <receiver android:name=".LoggingReceiver" />
