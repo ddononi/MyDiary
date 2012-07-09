@@ -5,15 +5,14 @@
     android:background="@drawable/list_selector"
     android:orientation="horizontal" >
 
-    <ImageView
-        android:id="@+id/list_weather"
+    <kr.co.diary.widget.WebImageView
+        android:id="@+id/icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/dunno" />
+        android:scaleType="centerInside" />
 
     <RelativeLayout
         android:layout_width="match_parent"

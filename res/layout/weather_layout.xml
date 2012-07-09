@@ -1,38 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical" >
-
 
     <Button
         android:id="@+id/local_btn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/btn"
         android:padding="10dp"
         android:shadowColor="#ffffff"
         android:shadowDx="1"
         android:shadowDy="1"
         android:shadowRadius="1"
         android:text="지역선택"
-        android:background="@drawable/btn"
-        android:layout_marginBottom="10dp"
         android:textColor="#fff" />
-        
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-   		android:background="@drawable/list_selector"        
+        android:layout_height="90dp"
+        android:background="@drawable/list_selector"
         android:padding="10dp" >
 
         <TextView
             android:id="@+id/location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/location_weather"
-            android:layout_alignTop="@+id/location_weather"
+            android:layout_alignTop="@+id/icon"
             android:shadowColor="#666"
             android:shadowDx=".5"
             android:shadowDy=".5"
@@ -40,58 +38,53 @@
             android:textColor="#000"
             android:textSize="20sp" />
 
-        <ImageView
-            android:id="@+id/location_weather"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentRight="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/dunno" />
-
-        <LinearLayout
-            android:id="@+id/location_lower_container"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/location_temp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/location_weather"
-            android:orientation="horizontal" >
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:shadowColor="#666"
+            android:shadowDx=".5"
+            android:shadowDy=".5"
+            android:shadowRadius=".5"
+            android:textColor="#000" />
 
-            <TextView
-                android:id="@+id/location_temp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-	            android:shadowColor="#666"
-	            android:shadowDx=".5"
-	            android:shadowDy=".5"
-	            android:shadowRadius=".5"
-	            android:textColor="#000" />
+        <TextView
+            android:id="@+id/location_hum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:shadowColor="#666"
+            android:shadowDx=".5"
+            android:shadowDy=".5"
+            android:shadowRadius=".5"
+            android:layout_marginBottom="10dp"    
+            android:layout_toRightOf="@id/location_temp"   
+            android:layout_marginLeft="10dp"     
+            android:textColor="#000" />
 
-            <TextView
-                android:id="@+id/location_hum"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-	            android:shadowColor="#666"
-	            android:shadowDx=".5"
-	            android:shadowDy=".5"
-	            android:shadowRadius=".5"
-	            android:textColor="#000" />
-        </LinearLayout>
+        <kr.co.diary.widget.WebImageView
+            android:id="@id/icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentRight="true"
+            android:scaleType="centerInside" />
     </RelativeLayout>
-    
-    <LinearLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="2px"
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2px"
         android:background="#ccc" />
 
     <ListView
-        android:dividerHeight="2px"
-        android:divider="#ccc"
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:divider="#ccc"
+        android:dividerHeight="2px" />
 
     <TextView
         android:layout_width="match_parent"

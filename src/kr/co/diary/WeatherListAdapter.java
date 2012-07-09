@@ -3,8 +3,7 @@ package kr.co.diary;
 import java.util.ArrayList;
 
 import kr.co.diary.data.ForecastData;
-import kr.co.diary.data.Memo;
-
+import kr.co.diary.widget.WebImageView;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +13,10 @@ import android.widget.TextView;
 
 public class WeatherListAdapter extends BaseAdapter {
 	private ArrayList<ForecastData> list = null;
-	private Context mContext;
-	private LayoutInflater inflater;
-	
-	public WeatherListAdapter(ArrayList<ForecastData> list, Context mContext) {
+	private final Context mContext;
+	private final LayoutInflater inflater;
+
+	public WeatherListAdapter(final ArrayList<ForecastData> list, final Context mContext) {
 		this.list = list;
 		this.mContext = mContext;
 		inflater = LayoutInflater.from(mContext);
@@ -30,13 +29,13 @@ public class WeatherListAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public Object getItem(final int position) {
 		// TODO Auto-generated method stub
 		return list.get(position);
 	}
 
 	@Override
-	public long getItemId(int position) {
+	public long getItemId(final int position) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -49,14 +48,16 @@ public class WeatherListAdapter extends BaseAdapter {
 		ForecastData data = (ForecastData)getItem(position);
 		// 엘리먼트 후킹
 		TextView dayOfWeekTv = (TextView) item.findViewById(R.id.list_dayofweek);
-		TextView conditionTv = (TextView) item.findViewById(R.id.list_condition);		
-		TextView maxTempTv = (TextView) item.findViewById(R.id.list_max_temp);	
-		TextView minTempTv = (TextView) item.findViewById(R.id.list_min_temp);			
+		TextView conditionTv = (TextView) item.findViewById(R.id.list_condition);
+		TextView maxTempTv = (TextView) item.findViewById(R.id.list_max_temp);
+		TextView minTempTv = (TextView) item.findViewById(R.id.list_min_temp);
+		WebImageView imgTv = (WebImageView) item.findViewById(R.id.icon);
 		// 엘리먼트에 값을 set해준다,
 		dayOfWeekTv.setText(data.getDayOfWeek()+"요일");
 		conditionTv.setText(data.getCondition());
 		maxTempTv.setText(data.getHighTemp() +"℃");
 		minTempTv.setText(data.getLowTemp() +"℃");
+		imgTv.setImasgeUrl(BaseActivity.GOOGLE_URL + data.getWeatherImgUrl());
 		return item;
 	}
 

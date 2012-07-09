@@ -73,6 +73,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 	private TextView monthTV; // 상단 월 텍스트
 	private ProgressBar loadingBar; // 날씨에 보여줄 로딩바
 	private ViewSwitcher switcher; // 상단 월 에니메이션을 위한 뷰 스위쳐
+	private View preBtn;			// 이전 선택 버튼
 
 	// animation
 	private Animation ani; // 버튼 에니메이션
@@ -110,7 +111,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_layout);
 
 		if (!MyUtils.checkVersion("mydiary", "1.1")) {
 			finish();
@@ -163,6 +164,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 
 	}
 
+
 	/**
 	 * 달력 생성 및 초기화
 	 */
@@ -194,6 +196,22 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 				dayBtn.setText("0");
 				dayBtn.setLayoutParams(btnParams);
 				final int weekIndex = day;
+				dayBtn.setOnClickListener(new OnClickListener() {
+
+					/**
+					 * 선택한 버튼 포커스 주기
+					 */
+					@Override
+					public void onClick(final View v) {
+						v.setBackgroundColor(R.color.select);
+						// 이전 버튼 포커스 제거
+						if(preBtn != null){
+							preBtn.setBackgroundResource(R.drawable.selector);
+						}
+						preBtn = v;
+					}
+				});
+
 				// 날짜에 이벤트 설정
 				dayBtn.setOnLongClickListener(new OnLongClickListener() {
 					@Override
