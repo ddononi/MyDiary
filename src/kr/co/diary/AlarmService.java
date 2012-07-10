@@ -9,9 +9,7 @@ import java.util.List;
 import kr.co.diary.data.Logging;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.PendingIntent.CanceledException;
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,6 +34,7 @@ public class AlarmService extends Service {
 	private int alarmDistance; // 알람 발생 간격 미터
 	private final List<Logging> list = new ArrayList<Logging>();
 
+	private LocationManager locationManager;
 	/** 서비스가 실행될때 */
 	@Override
 	public int onStartCommand(final Intent intent, final int flags,
@@ -49,23 +48,25 @@ public class AlarmService extends Service {
 		// 알람을 발생해줄 거리 설정값 가져오기, 없으면 300미터
 		alarmDistance = Integer.valueOf(defaultSharedPref.getString(
 				"placeAlarm", "300"));
-		// 거리 단위 변환 km -> m
-		alarmDistance *= 0.001;
 
 		// 알람을 발생할 로깅 리스트 가져오기
 		getAlarmLoggingList();
 		// 위치 수신하기
 		getLocation();
+
+		// 주변 위치 알림 설정
+		checkProximity();
+
 		// 알람을 발생할 날짜 얻기
 		calendar = getAlarmDate(beforeMin); // 알람시간이 설정된 calendar를 가져온다.
 
 		if (calendar == null) { // 설정된 알람시간이 없으면 종료
 			return 0;
 		}
-		
+
 		Log.i(BaseActivity.DEBUG_TAG,
 				"알람시간 : " + calendar.get(Calendar.HOUR_OF_DAY) + ":"
-						+ calendar.get(Calendar.MINUTE));		
+						+ calendar.get(Calendar.MINUTE));
 
 		// 시스템서비스에서 알람매니져를 얻어온다.
 		am = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -78,7 +79,32 @@ public class AlarmService extends Service {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender); // 알람설정
 		Log.i(BaseActivity.PREFERENCE, "onstartCommand");
+
 		return 0;
+	}
+
+	/**
+	 * 알람 장소 리시버 설정
+	 */
+	private void checkProximity(){
+		Log.i(BaseActivity.DEBUG_TAG, "알람 갯수-------->" + list.size());
+		if (list.size() > 0) { // 알람이 설정된 위치로깅이 있으면 검색한다.
+			for (Logging l : list) { // 위치알람 리스트를 가져온다.
+				// 브로드케스트 리시버에 보낼 팬딩인텐트, 이전 팬딩인텐트가 있으면 취소하고 새로 실행
+				Intent i = new Intent(getBaseContext(),
+						LoggingReceiver.class);
+				Bundle bundle = new Bundle();
+				bundle.putSerializable("alarmed_place", l);
+				i.putExtras(bundle);
+				// 브로드케스팅을 수신할 팬딩 인텐트 설정
+				PendingIntent sender = PendingIntent.getBroadcast(
+						getBaseContext(), 0, i,
+						PendingIntent.FLAG_CANCEL_CURRENT);
+				// 근접 알림 등록
+				// 위도, 경도, 지정한 위경도 중심으로 근접 알림 반경 지정 (미터 단위), 근접 알림 해제 시간
+				locationManager.addProximityAlert(l.getLat(), l.getLon(), alarmDistance, -1, sender);
+			}
+		}
 	}
 
 	/**
@@ -89,7 +115,7 @@ public class AlarmService extends Service {
 		SQLiteDatabase db = dbhp.getReadableDatabase();
 		Cursor cursor = null;
 		// 알람 설정이 되어 있는 row 만 가져온다.
-		cursor = db.query(DBHelper.MY_PLACE_TABLE, null, "alarm = 1", null,
+		cursor = db.query(DBHelper.MY_PLACE_TABLE, null, "alarm = ?", new String[]{"1", },
 				null, null, null);
 		if (cursor.getCount() <= 0) { // 내역이 없으면 끝낸다.
 			dbhp.close();
@@ -108,6 +134,7 @@ public class AlarmService extends Service {
 				l.setDate(cursor.getString(cursor.getColumnIndex("date")));
 				l.setTag(cursor.getString(cursor.getColumnIndex("tag")));
 				list.add(l); // arrayList 에 추가
+				Log.i(BaseActivity.DEBUG_TAG, "added alarm");
 			} while (cursor.moveToNext()); // 다음 커서로
 		}
 		// 디비를 닫아준다.
@@ -117,7 +144,7 @@ public class AlarmService extends Service {
 
 	/**
 	 * DB에서 가장 현재시간과 가까운 알람시간을 가져온다.
-	 * 
+	 *
 	 * @return
 	 */
 	private Calendar getAlarmDate(final int beforeMin) {
@@ -182,7 +209,7 @@ public class AlarmService extends Service {
 		// 위치 수신을 제거한다.
 		if (loclistener != null) {
 			// 위치수신 관리자 얻기
-			LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 			// 위치 수신 제거
 			locationManager.removeUpdates(loclistener);
 		}
@@ -209,45 +236,7 @@ public class AlarmService extends Service {
 		 */
 		@Override
 		public void onLocationChanged(final Location location) {
-			Log.w(BaseActivity.DEBUG_TAG, "onLocationChanged");
-			Log.i(BaseActivity.DEBUG_TAG, "알람 갯수-------->" + list.size());
-			if (list.size() > 0) { // 알람이 설정된 위치로깅이 있으면 검색한다.
-				// 거리 차이를 미터로 반환
-				double lat = location.getLatitude();
-				double lon = location.getLongitude();
-				for (Logging l : list) { // 위치알람 리스트를 가져온다.
-					// 현재위치와 알람위치와 거리차이를 계산한다.
-					double distance = getDistance_arc(lat, lon, l.getLat(),
-							l.getLon());
-					Log.i(BaseActivity.DEBUG_TAG, "distance-------->"
-							+ distance);
-					// 거리차이가 알람 발생 거리보다 적으면 브로드캐스팅 발생
-					if (distance < alarmDistance) {
-						if (removeAlarmedPlace(l) > 0) { // 확인된 위치로깅 알람은 확인으로
-															// 변경한후 브로드캐스팅처리
-							LocationManager locationManager;
-							locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-							locationManager.removeUpdates(this);
-							// 브로드케스트 리시버에 보낼 팬딩인텐트, 이전 팬딩인텐트가 있으면 취소하고 새로 실행
-							Intent i = new Intent(getBaseContext(),
-									LoggingReceiver.class);
-							Bundle bundle = new Bundle();
-							bundle.putSerializable("alarmed_place", l);
-							i.putExtras(bundle);
-							// 브로드케스팅을 수신할 팬딩 인텐트 설정
-							PendingIntent sender = PendingIntent.getBroadcast(
-									getBaseContext(), 0, i,
-									PendingIntent.FLAG_CANCEL_CURRENT);
-							try {
-								sender.send(); // 브로드케스팅
-							} catch (CanceledException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			}
+
 		}
 
 		@Override
@@ -271,7 +260,6 @@ public class AlarmService extends Service {
 	 * 위치 리스너 설정
 	 */
 	private void getLocation() {
-		LocationManager locationManager;
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 		// 최적의 위치 수신자를 가져온다.
@@ -286,7 +274,7 @@ public class AlarmService extends Service {
 		String provider = locationManager.getBestProvider(criteria, true);
 		// 위치 업데이트 설정
 		// 1분, 10미터이동이 발생할때마다 위치 수신 리스너를 업데이트를 한다.
-		locationManager.requestLocationUpdates(provider, 1000 * 60, 10,
+		locationManager.requestLocationUpdates(provider, 1000 * 60, 0,
 				loclistener);
 		/*
 		 * String provider; // gps 가 켜져 있으면 gps로 먼저 수신 if
@@ -296,11 +284,11 @@ public class AlarmService extends Service {
 		 * loclistener);// 현재정보를 업데이트 mLocation =
 		 * locationManager.getLastKnownLocation(provider); } else { // 없으면 null
 		 * mLocation = null; }
-		 * 
+		 *
 		 * if (mLocation == null) { // 무선 네크워트를 통한 위치 설정이 안되어 있으면 그냥 null 처리 if
 		 * (!(locationManager
 		 * .isProviderEnabled(LocationManager.NETWORK_PROVIDER))) { }
-		 * 
+		 *
 		 * // 네트워크로 위치를 가져옴 provider = LocationManager.NETWORK_PROVIDER; //
 		 * criteria.setAccuracy(Criteria.ACCURACY_COARSE); // provider =
 		 * locationManager.getBestProvider(criteria, true); mLocation =
@@ -315,28 +303,8 @@ public class AlarmService extends Service {
 	}
 
 	/**
-	 * 알람이 발생된 위치를 디비에서 제거한다.
-	 * 
-	 * @param log
-	 *            위치알람 객체
-	 * @return 처리결과값 1 or 0
-	 */
-	private int removeAlarmedPlace(final Logging log) {
-		int result = -1;
-		DBHelper dbhp = new DBHelper(this);
-		SQLiteDatabase db = dbhp.getWritableDatabase();
-		ContentValues cv = new ContentValues();
-		cv.put("alarm", 0);
-		// 인덱스 번호를 이용하여 alarm 값을 0으로 주어 알람 설정이 안되도록 한다.
-		result = db.update(DBHelper.MY_PLACE_TABLE, cv, "no = ?",
-				new String[] { "" + log.getIdx(), });
-		db.close();
-		return result;
-	}
-
-	/**
 	 * 두지점간의 거리 구하기
-	 * 
+	 *
 	 * @param sLat
 	 * @param sLong
 	 * @param dLat

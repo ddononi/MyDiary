@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import kr.co.diary.data.Logging;
+import kr.co.diary.map.MapActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -82,9 +84,12 @@ implements IDiaryList {
 	}
 
 	@Override
-	public void onItemClick(final AdapterView<?> arg0, final View arg1, final int arg2, final long arg3) {
-		// TODO Auto-generated method stub
-
+	public void onItemClick(final AdapterView<?> av, final View v, final int pos, final long arg3) {
+		Intent intent =new Intent(this, MapActivity.class);
+		Logging data = list.get(pos);
+		intent.setAction("logging_place_view");
+		intent.putExtra("loggingData", data);
+		startActivity(intent);
 	}
 
 	@Override
@@ -112,7 +117,7 @@ implements IDiaryList {
 				lat = Double.valueOf(cursor.getString(cursor.getColumnIndex("lat")));
 				log.setLat(lat);
 				lon = Double.valueOf(cursor.getString(cursor.getColumnIndex("lon")));
-				log.setLat(lon);
+				log.setLon(lon);
 				log.setTag(cursor.getString(cursor.getColumnIndex("tag")));
 				loggingDate = cursor.getString(cursor.getColumnIndex("date"));
 				log.setDate(loggingDate.substring(0, 10));

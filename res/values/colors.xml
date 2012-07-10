@@ -11,5 +11,7 @@
     <color name="memo_select">#44FEEC44</color>
 	<color name="list_focused">#9ac02f</color>
     <color name="white">#FFFFFF</color>
-    <color name="transparent_background">#00000000</color>    
+    <color name="transparent_background">#00000000</color>  
+    
+    <color name="today">#FBAB85</color>  
 </resources>

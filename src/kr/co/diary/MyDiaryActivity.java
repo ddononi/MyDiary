@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import kr.co.diary.map.MapActivity;
+import kr.co.diary.map.RegMapActivity;
 import kr.co.myutils.MyUtils;
 
 import org.apache.http.client.ClientProtocolException;
@@ -206,7 +207,11 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 						v.setBackgroundColor(R.color.select);
 						// 이전 버튼 포커스 제거
 						if(preBtn != null){
-							preBtn.setBackgroundResource(R.drawable.selector);
+							if(preBtn.getTag() != null){
+								preBtn.setBackgroundResource((Integer)preBtn.getTag());
+							}else{
+								preBtn.setBackgroundResource(R.drawable.selector);
+							}
 						}
 						preBtn = v;
 					}
@@ -348,7 +353,8 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 
 			if (currentMonth == selMonth && today == j
 					&& currentYear == selYear) { // 오늘날짜에 색 강조
-				list.get(days).setBackgroundColor(Color.parseColor("#FBAB85"));
+				list.get(days).setBackgroundResource(R.color.today);
+				list.get(days).setTag(R.color.today);
 			} else {
 				list.get(days).setBackgroundResource(R.drawable.selector);
 			}
@@ -388,6 +394,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 						if (Integer.valueOf(btn.getText().toString()) == searchDay) {
 							Log.i(DEBUG_TAG, "write memo day-->" + searchDay);
 							btn.setBackgroundResource(R.drawable.has_memo_selector);
+							btn.setTag(R.drawable.has_memo_selector);
 						}
 					}
 				}
@@ -684,10 +691,11 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
     public boolean onCreateOptionsMenu(final Menu menu){
     	super.onCreateOptionsMenu(menu);
     	menu.add(0,1,0, "현재위치로깅");
-    	menu.add(0,2,0, "로깅지도보기");
-    	menu.add(0,3,0, "로깅내역");
-    	menu.add(0,4,0, "날씨보기");
-    	menu.add(0,5,0, "설정");
+    	menu.add(0,2,0, "지도위치로깅");
+    	menu.add(0,3,0, "로깅지도보기");
+    	menu.add(0,4,0, "로깅내역");
+    	menu.add(0,5,0, "날씨보기");
+    	menu.add(0,6,0, "설정");
 
     	//menu.add(0,4,0, "도움말");
     	//item.setIcon();
@@ -702,9 +710,9 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 	    	case 1:	// 내 위치 추가
 	    		addMyPlace();
 	    		break;
-	    	case 2:	// 내 위치 로깅 내역 지도  보기
-	    		intent =new Intent(MyDiaryActivity.this,
-	    				MapActivity.class);
+	    	case 2:	// 지도에서 위치 추가
+	    		intent = new Intent(MyDiaryActivity.this,
+	    				RegMapActivity.class);
 	    		double[] geo = getLocation();
 	    		if(geo !=null){	// 현재좌표가 있으면 인텐트에 싣는다.
 		    		intent.putExtra("lat", geo[0]);
@@ -712,15 +720,25 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 	    		}
 	    		startActivity(intent);
 	    		break;
-    		case 3:		// 로깅내역들 보기
+	    	case 3:	// 내 위치 로깅 내역 지도  보기
+	    		intent =new Intent(MyDiaryActivity.this,
+	    				MapActivity.class);
+	    		geo = getLocation();
+	    		if(geo !=null){	// 현재좌표가 있으면 인텐트에 싣는다.
+		    		intent.putExtra("lat", geo[0]);
+		    		intent.putExtra("lon", geo[1]);
+	    		}
+	    		startActivity(intent);
+	    		break;
+    		case 4:		// 로깅내역들 보기
 				intent = new Intent(getBaseContext(), LoggingListActivity.class);
 				startActivity(intent);
 				return true;
-    		case 4:		// 날씨보기
+    		case 5:		// 날씨보기
 				intent = new Intent(getBaseContext(), WeatherActivity.class);
 				startActivity(intent);
 				return true;
-    		case 5:		// 설정 프리퍼런스엑티비티
+    		case 6:		// 설정 프리퍼런스엑티비티
 				intent = new Intent(getBaseContext(), SettingActivity.class);
 				startActivity(intent);
 				return true;

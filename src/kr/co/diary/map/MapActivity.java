@@ -1,14 +1,20 @@
 package kr.co.diary.map;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import kr.co.diary.BaseActivity;
 import kr.co.diary.DBHelper;
 import kr.co.diary.R;
+import kr.co.diary.data.Logging;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -60,7 +66,7 @@ public class MapActivity extends NMapActivity {
 	public void onCreate(final Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.map);
+		setContentView(R.layout.map_layout);
 
 		/* mapView  설정  */
 		mMapView = (NMapView)findViewById(R.id.mapView);
@@ -166,22 +172,45 @@ public class MapActivity extends NMapActivity {
 
 		@Override
 		public void onMapInitHandler(final NMapView arg0, final NMapError arg1) {
-			// TODO Auto-generated method stub
-			// 이전 인텐트에서 위치좌표를 가져온다.
 			Intent intent = getIntent();
-			double lat = intent.getDoubleExtra("lat", 37.571747);
-			double lon = intent.getDoubleExtra("lon", 126.999158);
-			NGeoPoint initPlace = new NGeoPoint(lon, lat);
-			/*
-			if(intent.hasExtra("lat")){	// 넘어온 좌표가 있으면
-				Toast.makeText(MapActivity.this,
-						"현재 위치로 부터 위치내역을 보여줍니다.", Toast.LENGTH_SHORT).show();
+			NGeoPoint point;
+			// \로깅 위치 선택 액션인지 체크
+			if(intent.getAction() != null && intent.getAction().equals("logging_place_view")){
+				Logging data = (Logging)intent.getSerializableExtra("loggingData");
+		    	mOverlayManager.clearOverlays();
+				int markerId = NMapPOIflagType.PIN;
+				NMapPOIdata poiData = new NMapPOIdata(1, mMapViewerResourceProvider);
+				point = new NGeoPoint(data.getLon(), data.getLat());
+				poiData.beginPOIdata(1);	// 아이템 갯수 넣어주자
+				poiData.addPOIitem(point, data.getTag(), markerId, 1); 	// 아이템 추가
+				poiData.endPOIdata();	// 오버레이를 닫아주자
+				// create POI data overlay
+				mOverlayManager.createPOIdataOverlay(poiData, null);
+			}else{
+				// 이전 인텐트에서 위치좌표를 가져온다.
+				double lat = intent.getDoubleExtra("lat", 37.571747);
+				double lon = intent.getDoubleExtra("lon", 126.999158);
+				point = new NGeoPoint(lon, lat);
+				dockMyPlaces();	// 내 위치 처리
 			}
-			*/
-			mMapController.setMapCenter( initPlace, MAP_LEVEL);
-
-		    dockMyPlaces();	// 내 위치 처리
-
+			mMapController.setMapCenter( point, MAP_LEVEL);
+			// Geocoder를 이용하여 좌표를 주소로 변환처리
+			Geocoder gc = new Geocoder(MapActivity.this,Locale.getDefault());
+			List<Address> addresses = null;
+			try {
+				addresses = gc.getFromLocation(point.getLatitude(), point.getLongitude(), 1);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String addressStr = "현위치";
+			if(addresses != null && addresses.size()>0) {	// 주소가 있으면
+				// 첫번째 주소 컬렉션을 얻은후
+				Address address = addresses.get(0);
+				// 실제 주소만 가져온다.
+				addressStr = address.getAddressLine(0).replace("대한민국", "").trim();
+				Toast.makeText(MapActivity.this, addressStr, Toast.LENGTH_LONG).show();
+			}
 		}
 
 		@Override

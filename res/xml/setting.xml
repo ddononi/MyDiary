@@ -49,7 +49,7 @@
 
         <PreferenceScreen
             android:key="version"
-            android:summary="다이어리 Ver 1.01b"
+            android:summary="다이어리 Ver 1.2b"
             android:title="프로그램 버전" />
     </PreferenceCategory>
 

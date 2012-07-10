@@ -6,9 +6,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -20,13 +22,17 @@ public class LoggingReceiver extends BroadcastReceiver {
 	private final int YOURAPP_NOTIFICATION_ID = 1;	// 앱 아이디값
 	private SharedPreferences sp;				// 소리 및 진동 설정
 	private Logging logging;
+	private Context context;
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
+		this.context = context;
 		Log.i("service", "broadcast catch!!");
 		logging = (Logging)intent.getSerializableExtra("alarmed_place");
-
+		// 위치 알람을 디비에서  제거한다.
+		removeAlarmedPlace(logging);
 		sp = PreferenceManager.getDefaultSharedPreferences(context);	// 환경설정값 가져오기
-		showNotification(context, R.drawable.ico_place);	// 통지하기
+		showNotification(R.drawable.ico_place);	// 통지하기
+
 	}
 
 	/**
@@ -35,7 +41,7 @@ public class LoggingReceiver extends BroadcastReceiver {
 	 * @param statusBarIconID
 	 * 		상태바에 나타낼 아이콘
 	 */
-	private void showNotification(final Context context, final int statusBarIconID) {
+	private void showNotification(final int statusBarIconID) {
 		// MyScheduleActivity 로 엑티비티 설정
 
 		Intent contentIntent = new Intent(context, MapActivity.class);
@@ -69,5 +75,25 @@ public class LoggingReceiver extends BroadcastReceiver {
 		notif.setLatestEventInfo(context, title, message, theappIntent);	// 통지바 설정
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.notify(this.YOURAPP_NOTIFICATION_ID, notif);	// 통지하기
+	}
+
+	/**
+	 * 알람이 발생된 위치를 디비에서 제거한다.
+	 *
+	 * @param log
+	 *            위치알람 객체
+	 * @return 처리결과값 1 or 0
+	 */
+	private int removeAlarmedPlace(final Logging log) {
+		int result = -1;
+		DBHelper dbhp = new DBHelper(context);
+		SQLiteDatabase db = dbhp.getWritableDatabase();
+		ContentValues cv = new ContentValues();
+		cv.put("alarm", 0);
+		// 인덱스 번호를 이용하여 alarm 값을 0으로 주어 알람 설정이 안되도록 한다.
+		result = db.update(DBHelper.MY_PLACE_TABLE, cv, "no = ?",
+				new String[] { "" + log.getIdx(), });
+		db.close();
+		return result;
 	}
 }

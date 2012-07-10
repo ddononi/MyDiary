@@ -1,3 +1,4 @@
+#Mon Jul 09 17:47:19 KST 2012
 eclipse.preferences.version=1
 encoding//src/kr/co/diary/AlarmReceiver.java=UTF-8
 encoding//src/kr/co/diary/AlarmService.java=UTF-8
@@ -19,4 +20,5 @@ encoding//src/kr/co/diary/data/Logging.java=UTF-8
 encoding//src/kr/co/diary/data/Memo.java=UTF-8
 encoding//src/kr/co/diary/data/Schedule.java=UTF-8
 encoding//src/kr/co/diary/map/MapActivity.java=UTF-8
+encoding//src/kr/co/diary/map/RegMapActivity.java=UTF-8
 encoding/<project>=UTF-8

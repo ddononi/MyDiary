@@ -66,11 +66,11 @@
             android:layout_below="@id/list_condition"
             android:layout_toRightOf="@id/max_label"
             android:layout_marginRight="20dp"
-            android:shadowColor="#619FFE"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:textColor="#6178FE"/>             
+            android:shadowColor="#FF1201"
+            android:shadowDx=".5"
+            android:shadowDy=".5"
+            android:shadowRadius=".5"
+            android:textColor="#FF9F01"/>        
         
         <TextView
             android:layout_below="@id/list_condition"            
@@ -89,11 +89,11 @@
             android:id="@+id/list_min_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:shadowColor="#FF1201"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:textColor="#FF9F01"/>
+            android:shadowColor="#619FFE"
+            android:shadowDx=".5"
+            android:shadowDy=".5"
+            android:shadowRadius=".5"
+            android:textColor="#6178FE"/>              
     </RelativeLayout>
 
 </LinearLayout>
