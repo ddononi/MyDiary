@@ -25,7 +25,6 @@
             android:name=".MyDiaryActivity" android:screenOrientation="portrait" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <!--  메모 엑티비티 -->
@@ -49,9 +48,14 @@
 
         <receiver android:name=".AlarmReceiver" />
         <receiver android:name=".LoggingReceiver" />
-        <service android:name=".AlarmService"></service>     
-        
-        
+        <service android:name=".AlarmService"></service>  
+        <!--  부팅시 처리할 리시버 -->   
+		<receiver android:name=".BootBroadCastReceiver">
+	        <intent-filter>
+	          <action android:name="android.intent.action.BOOT_COMPLETED" />
+	          <category android:name="android.intent.category.LAUNCHER" />          
+	        </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
