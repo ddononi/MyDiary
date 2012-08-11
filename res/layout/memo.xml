@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bgboard"
+    android:background="@drawable/bg"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical" >
 
     <TextView
+        android:layout_marginTop="70dp"
         android:id="@+id/date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
