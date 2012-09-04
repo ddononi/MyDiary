@@ -61,7 +61,7 @@
 		    android:layout_marginLeft="20px"
 		    android:layout_marginRight="20px"				
 			android:shadowColor="#ffffff"
-			android:text="위치 저장"	
+			android:text="여행위치 저장"	
 		 />		       
 
 </LinearLayout>

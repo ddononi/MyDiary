@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/addr_searchbox"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/txt_win_bg"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/start_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/txt_input"
+        android:text="고덕1동527-4"        
+        android:hint="출발위치를 입력하세요" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/search_start_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="10dp"   
+            android:layout_weight="1"
+            android:background="@drawable/loc_btn"
+            android:text="위치 찾기"
+            android:textColor="#fff"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/loc_start_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/loc_btn"
+            android:layout_marginLeft="5dp"              
+            android:text="현위치"
+            android:textColor="#fff"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+     <EditText
+        android:id="@+id/end_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/txt_input"
+        android:text="여수시"
+        android:hint="도착 위치를 입력하세요" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/search_end_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="10dp"            
+            android:layout_weight="1"
+            android:background="@drawable/loc_btn"
+            android:text="위치 찾기"
+            android:textColor="#fff"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/loc_end_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@drawable/loc_btn"
+            android:text="현위치"
+            android:layout_marginRight="10dp"  
+            android:layout_marginLeft="5dp"                          
+            android:textColor="#fff"
+            android:textSize="18sp" />
+    </LinearLayout>
+    
+    <Button
+        android:id="@+id/priority_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/loc_btn"
+        android:text="우선순위"
+        android:layout_margin="10dp"
+        android:textColor="#fff"
+        android:textSize="18sp" />    
+
+    <Button
+        android:id="@+id/search_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/search_btn"
+        android:text="경로 검색"
+        android:textColor="#fff"
+        android:textSize="18sp" />
+
+</LinearLayout>

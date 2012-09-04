@@ -20,7 +20,7 @@
 			android:layout_marginLeft="10px"
 			android:layout_marginRight="10px"
 			android:lines="2"
-			android:hint="여기에 일정을 입력하세요.."
+			android:hint="여기에 여행일정을 입력하세요.."
 			android:gravity="top"
 			android:textColor="#111111"
 			android:padding="10dp"

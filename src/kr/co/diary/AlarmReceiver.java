@@ -25,7 +25,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public void onReceive(final Context context, final Intent intent) {
 		Log.i("service", "broadcast catch!!");
 		sp = PreferenceManager.getDefaultSharedPreferences(context);	// 환경설정값 가져오기
-		showNotification(context, R.drawable.alarm);	// 통지하기
+		showNotification(context, R.drawable.knapsack);	// 통지하기
 	}
 
 	/**

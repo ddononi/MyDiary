@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, MyDiaryActivity!</string>
-    <string name="app_name">MyDiary</string>
+    <string name="app_name">여행다이어리</string>
     
     <string-array name="time_list_preference">
         <item>10분전</item>

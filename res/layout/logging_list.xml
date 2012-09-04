@@ -3,7 +3,7 @@
     android:id="@+id/root"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/bgboard"
+    android:background="@drawable/bg_repeat"
     android:orientation="vertical" >
 
     <TextView
@@ -18,7 +18,7 @@
         android:shadowRadius="1"
         android:id="@+id/title"
         android:textColor="#f7f3f7"
-        android:text="위치 로깅 내역"
+        android:text="여행기록 내역"
         android:textSize="18dp" />
 
     <LinearLayout

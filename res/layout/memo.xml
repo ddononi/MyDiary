@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bgboard"
+    android:background="@drawable/bg_repeat"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical" >
 
@@ -43,7 +43,7 @@
                 android:layout_marginTop="60px"
                 android:background="#00000000"
                 android:gravity="top"
-                android:hint="여기에 메모를 입력하세요."
+                android:hint="여기에 여행메모를 입력하세요."
                 android:inputType="textMultiLine"
                 android:lines="8"
                 android:maxLines="6"
