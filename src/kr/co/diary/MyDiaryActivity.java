@@ -289,17 +289,6 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 									intent.putExtra("selectedDay", selectedDay);
 									startActivity(intent);
 									break;
-								case 5: // 녹음 하기
-									RecordDialog recordDailog = new RecordDialog(
-											MyDiaryActivity.this);
-
-									recordDailog.show();
-									break;
-								case 6: // 녹음 리스트
-									intent = new Intent(MyDiaryActivity.this,
-											RecordListActivity.class);
-									startActivity(intent);
-									break;
 
 								}
 							}
@@ -690,12 +679,11 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu){
     	super.onCreateOptionsMenu(menu);
-    	menu.add(0,1,0, "현재위치로깅");
-    	menu.add(0,2,0, "지도위치로깅");
-    	menu.add(0,3,0, "로깅지도보기");
-    	menu.add(0,4,0, "로깅내역");
-    	menu.add(0,5,0, "날씨보기");
-    	menu.add(0,6,0, "설정");
+    	menu.add(0,1,0, "현재위치기록");
+    	menu.add(0,2,0, "지도기록보기");
+    	menu.add(0,3,0, "지도보기");
+    	menu.add(0,4,0, "여행기록내역");
+    	menu.add(0,5,0, "설정");
 
     	//menu.add(0,4,0, "도움말");
     	//item.setIcon();
@@ -734,20 +722,10 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 				intent = new Intent(getBaseContext(), LoggingListActivity.class);
 				startActivity(intent);
 				return true;
-    		case 5:		// 날씨보기
-				intent = new Intent(getBaseContext(), WeatherActivity.class);
-				startActivity(intent);
-				return true;
-    		case 6:		// 설정 프리퍼런스엑티비티
+    		case 5:		// 설정 프리퍼런스엑티비티
 				intent = new Intent(getBaseContext(), SettingActivity.class);
 				startActivity(intent);
 				return true;
-				/*
-			case 5:		// 도움말 액티비티로 이동
-				intent = new Intent(getBaseContext(), HelpActivity.class);
-				startActivity(intent);	// 특별한 요청코드는 필요없음
-				return true;
-				*/
 
     	}
     	return false;

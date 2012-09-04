@@ -37,10 +37,6 @@
         <activity android:theme="@android:style/Theme.NoTitleBar" android:name="SettingActivity"></activity>
         <!--  스케쥴 엑티비티 -->
         <activity android:theme="@android:style/Theme.NoTitleBar"  android:name=".ScheduleListActivity"></activity>
-        <!--  날씨 엑티비티  -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".WeatherActivity"></activity>
-        <!--  녹음 엑티비티 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".RecordListActivity"></activity>        
 		<!--  map -->        
         <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".map.MapActivity"></activity>
         <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".LoggingListActivity"></activity>
