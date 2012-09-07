@@ -174,7 +174,7 @@ public class MapActivity extends NMapActivity {
 		public void onMapInitHandler(final NMapView arg0, final NMapError arg1) {
 			Intent intent = getIntent();
 			NGeoPoint point;
-			// \로깅 위치 선택 액션인지 체크
+			// 로깅 위치 선택 액션인지 체크
 			if(intent.getAction() != null && intent.getAction().equals("logging_place_view")){
 				Logging data = (Logging)intent.getSerializableExtra("loggingData");
 		    	mOverlayManager.clearOverlays();
