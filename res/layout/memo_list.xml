@@ -17,7 +17,7 @@
         android:shadowDy="1"
         android:shadowRadius="1"
         android:id="@+id/title"
-        android:textColor="#f7f3f7"
+        android:textColor="#333"
         android:textSize="18dp" />
 
     <LinearLayout
@@ -35,6 +35,8 @@
         android:id="@+id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:dividerHeight="1px"
+        android:divider="#888"        
         android:background="#00000000"
         android:cacheColorHint="#00000000" />
 

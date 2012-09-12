@@ -1,4 +1,4 @@
-package kr.co.diary.navi;
+package kr.co.diary.data;
 
 import java.io.Serializable;
 

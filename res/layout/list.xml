@@ -12,7 +12,7 @@
         android:background="@drawable/selector"
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
-        android:textColor="#ffffff"
+        android:textColor="#333"
         android:shadowDx="1"
         android:shadowDy="1"
         android:shadowRadius="1"

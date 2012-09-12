@@ -39,8 +39,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 		Intent contentIntent = new Intent(context, ScheduleListActivity.class);
 		// 알림클릭시 이동할 엑티비티 설정
 		PendingIntent theappIntent = PendingIntent.getActivity(context, 0,contentIntent, 0);
-		CharSequence title = "일정 알림"; // 알림 타이틀
-		CharSequence message = "일정 알림" + sp.getString("beforeAlarm", "10") + "분전 입니다."; // 알림 내용
+		CharSequence title = "여행일정 알림"; // 알림 타이틀
+		CharSequence message = "여행일정 알림" + sp.getString("beforeAlarm", "10") + "분전 입니다."; // 알림 내용
 
 		// 통지바 설정
 		Notification notif = new Notification(statusBarIconID, null,

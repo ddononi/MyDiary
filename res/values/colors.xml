@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="select">#adc7f7</color>
+    <color name="select">#66FF481F</color>
     <color name="normal">#00000000</color>
     <color name="drag_active_color">#80cccccc</color>
     

@@ -4,20 +4,31 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import kr.co.diary.DBHelper;
 import kr.co.diary.R;
+import kr.co.diary.data.GPoint;
+import kr.co.diary.data.VerTexData;
+import kr.co.diary.navi.GeoRouteSearch;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,9 +50,12 @@ import com.nhn.android.maps.nmapmodel.NMapError;
 import com.nhn.android.maps.nmapmodel.NMapPlacemark;
 import com.nhn.android.maps.overlay.NMapPOIdata;
 import com.nhn.android.maps.overlay.NMapPOIitem;
+import com.nhn.android.maps.overlay.NMapPathData;
+import com.nhn.android.maps.overlay.NMapPathLineStyle;
 import com.nhn.android.mapviewer.overlay.NMapCalloutOverlay;
 import com.nhn.android.mapviewer.overlay.NMapMyLocationOverlay;
 import com.nhn.android.mapviewer.overlay.NMapOverlayManager;
+import com.nhn.android.mapviewer.overlay.NMapPathDataOverlay;
 import com.nhn.android.mapviewer.overlay.NMapOverlayManager.OnCalloutOverlayListener;
 import com.nhn.android.mapviewer.overlay.NMapPOIdataOverlay;
 import com.nhn.android.mapviewer.overlay.NMapPOIdataOverlay.OnFloatingItemChangeListener;
@@ -57,17 +71,22 @@ public class RegMapActivity extends NMapActivity {
 	// mapview 설정
 	private NMapView mMapView = null;
 	private NMapController mMapController;
-	private static final String LOG_TAG = "NMapViewer";
-
 	private NMapMyLocationOverlay mMyLocationOverlay;
 	private NMapOverlayManager mOverlayManager;
 	private NMapLocationManager mMapLocationManager;
 	private NMapCompassManager mMapCompassManager;
 	private NMapViewerResourceProvider mMapViewerResourceProvider;
+	private NMapPathDataOverlay pathDataOverlay;	//  경로 오버레이
 	private final ArrayList<String> addressList = new ArrayList<String>(); // 주소를 저장할 리스트
 
 	private NGeoPoint mNgeoPoint = null;
 
+	
+	//navi
+	private VerTexData verTexData; 
+	private String totalDistance;
+	private String totalTime;	
+	private String startAddress;
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -240,7 +259,6 @@ public class RegMapActivity extends NMapActivity {
 			*/
 			mMapController.setMapCenter( initPlace, MAP_LEVEL);
 			initPoiItem(initPlace);
-
 		}
 
 		@Override
@@ -309,21 +327,10 @@ public class RegMapActivity extends NMapActivity {
 			// Geocoder를 이용하여 좌표를 주소로 변환처리
 			Geocoder gc = new Geocoder(RegMapActivity.this,Locale.getDefault());
 			List<Address> addresses = null;
-			try {
-				addresses = gc.getFromLocation(mNgeoPoint.getLatitude(), mNgeoPoint.getLongitude(), 1);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			String addressStr = "현위치";
-			if(addresses != null && addresses.size()>0) {	// 주소가 있으면
-				// 첫번째 주소 컬렉션을 얻은후
-				Address address = addresses.get(0);
-				// 실제 주소만 가져온다.
-				addressStr = address.getAddressLine(0).replace("대한민국", "").trim();
-				Toast.makeText(RegMapActivity.this, addressStr, Toast.LENGTH_LONG).show();
-				POIitem.setTitle(addressStr);
-			}
+			String address = searchAddress(mNgeoPoint.getLatitude(),mNgeoPoint.getLongitude());
+			POIitem.setTitle(address);			
+			
+			new PathLoadTask().execute();
 
 		}
 
@@ -401,6 +408,198 @@ public class RegMapActivity extends NMapActivity {
 			}
 		}
 	}
+	
+
+	
+	/**
+	 * 좌표를 이용하여 주소 얻기
+	 * @param lat
+	 * @param lon
+	 * @return
+	 */
+	private String searchAddress(double lat, double lon) {
+		Geocoder gc = new Geocoder(RegMapActivity.this,Locale.getDefault());
+		List<Address> addresses = null;
+		try {
+			addresses = gc.getFromLocation(lat, lon, 1);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(addresses != null && addresses.size()>0) {	// 주소가 있으면
+			// 첫번째 주소 컬렉션을 얻은후
+			Address address = addresses.get(0);
+			// 실제 주소만 가져온다.
+			return address.getAddressLine(0).replace("대한민국", "").trim();
+		}
+		return null;
+	}
+		
+	
+	
+
+	/**
+	 * 경로 받아오기 쓰레드 처리 클래스
+	 */
+	private class PathLoadTask extends AsyncTask<Void, Void, Boolean> {
+		private ProgressDialog progress;
+		private String jsonText;
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if (progress != null && progress.isShowing()) {
+				progress.dismiss();
+			}
+
+			if (result && jsonText != null) {	// 정상 수신
+				parseJson(jsonText.trim());
+				
+				ArrayList<GPoint> list = verTexData.getList();
+				if(list == null || list.size() == 0){
+					return;
+				}
+
+				GPoint gPoint;
+				int listSize = list.size();
+				// 이전 경로가 있으면 삭제
+				if(pathDataOverlay != null){
+					mOverlayManager.removeOverlay(pathDataOverlay);
+				}
+				NMapPathData pathData = new NMapPathData(listSize);
+				pathData.initPathData();
+				NMapPOIdata poiData = new NMapPOIdata(2, mMapViewerResourceProvider, true);
+				poiData.beginPOIdata(2);				
+				for (int i = 0; i < listSize; i++) {
+					gPoint = list.get(i);
+					if(i == 0){
+						NGeoPoint p = new NGeoPoint(gPoint.x, gPoint.y);
+						poiData.addPOIitem(p, startAddress, NMapPOIflagType.FROM, null);
+					}else if( i == (listSize- 1) ){
+						/*
+						NGeoPoint p = new NGeoPoint(gPoint.x, gPoint.y);
+						poiData.addPOIitem(p, "도착", NMapPOIflagType.TO, null);
+						poiData.endPOIdata();
+						poiDataOverlay = mOverlayManager.createPOIdataOverlay(poiData, null);
+						*/						
+					}					
+					pathData.addPathPoint(gPoint.x, gPoint.y, NMapPathLineStyle.TYPE_SOLID);
+				}
+				pathData.endPathData();
+				pathDataOverlay = mOverlayManager.createPathDataOverlay(pathData);
+				pathDataOverlay.showAllPathData(0);					
+			
+			}
+
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progress = ProgressDialog.show(RegMapActivity.this, "경로 탐색중",
+					"잠시만 기다려 주세요 경로를 탐색중입니다.");
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			jsonText = searchNaviPath();
+			return true;
+		}
+
+		/**
+		 * json을 파싱하여 경로정보를가져와 컬랙션에 좌표를 저장한다.
+		 * 
+		 * @param json
+		 *            원격지에서 받은 json String
+		 */
+		private void parseJson(String json) {
+			verTexData = new VerTexData();
+			ArrayList<GPoint> list = new ArrayList<GPoint>();
+			try {
+				// json 이외 문자 제거
+				json = json.replaceFirst("\"", "");
+				json = json.substring(0, json.lastIndexOf("\"") + 1);
+
+				JSONObject RESDATA = (new JSONObject(json))
+						.getJSONObject("RESDATA");
+				JSONObject SROUTE = RESDATA.getJSONObject("SROUTE");
+				JSONObject ROUTE = SROUTE.getJSONObject("ROUTE");
+				// 예상 시간
+				totalTime =  ROUTE.getString("total_time");
+				// 거리
+				totalDistance = ROUTE.getString("total_dist");
+				
+				/*
+				ROUTE":
+				{
+				"total_time":"14.28",
+				"total_dist":"2956",
+				"rg_count":"8",				
+				*/
+				JSONObject LINKS = SROUTE.getJSONObject("LINKS");
+				JSONArray links = LINKS.getJSONArray("link");
+
+				for (int i = 0; i < links.length(); i++) { // 경로 배열
+					JSONObject arr = links.getJSONObject(i);
+					JSONArray vertex = arr.getJSONArray("vertex"); // 좌표 버택스 배열
+					for (int j = 0; j < vertex.length(); j++) {
+						JSONObject obj = vertex.getJSONObject(j);
+
+						String y = obj.getString("y"); // y 좌표 얻기
+						String x = obj.getString("x"); // x 좌표 얻기
+						// 좌표를 저장
+						list.add(new GPoint(Double.valueOf(x), Double
+								.valueOf(y)));
+					}
+				}
+
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			verTexData.setList(list);
+		}
+		
+		/**
+		 * 경로 탐색 GeoRouteSearch 파라미터 설정후 경로 탐색 시작
+		 * 
+		 * @return 응답된 json 문자열
+		 */
+		private String searchNaviPath() {
+			Log.i("naviApp", "start");
+			// 경로 파라미터 객체
+			GeoRouteSearch.Params parmas = new GeoRouteSearch.Params();
+			//37.554857,127.168658
+			// 출발점
+			Intent intent = getIntent();
+			double lat = intent.getDoubleExtra("lat", 37.571747);
+			double lon = intent.getDoubleExtra("lon", 126.999158);
+			startAddress = searchAddress(lat, lon);
+			
+			
+			parmas.SX = String.valueOf(lon);
+			parmas.SY = String.valueOf(lat); 
+
+			parmas.EX = mNgeoPoint.getLongitude() + "";
+			parmas.EY = mNgeoPoint.getLatitude() + "";
+			// 이동 타입
+			parmas.RPTYPE = "0";
+			// 좌표 타입
+			parmas.COORDTYPE = "0";
+			// 경로 타입 설정
+			parmas.PRIORITY = "0";
+			// 현재 시각
+			parmas.timestamp = new SimpleDateFormat("yyyyMMddHHmmssSSS")
+					.format(new Date());
+			// 경로 찾기 수행
+			GeoRouteSearch t = new GeoRouteSearch(parmas);
+			String jsonText = t.execute();
+
+			return jsonText; // 경로 처리 json 응답값
+		}
+
+	}
+	
+	
 
 
 

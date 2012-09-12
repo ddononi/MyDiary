@@ -1,5 +1,7 @@
 package kr.co.diary.navi;
 
+import kr.co.diary.data.GPoint;
+
 
 /**
  *	��ǥ ��ȯ Ŭ����

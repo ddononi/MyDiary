@@ -19,7 +19,7 @@ public class GeoRouteSearch implements iConstant {
 		this.params = params;
 	}
 
-	protected String execute() {
+	public String execute() {
 		try {
 			// AppID:Key 로 구성한 값을 Base64 Encoding 한다.
 			String appid =  APP_ID + ":" + APP_KEY;
@@ -34,7 +34,7 @@ public class GeoRouteSearch implements iConstant {
 			URL url = new URL(	SEARCH_URL + getParams());
 			// URL 연결
 			URLConnection conn = url.openConnection();
-			conn.setDoOutput(true);
+			//conn.setDoOutput(true);
 			conn.setDoInput(true);
 			// 헤더에 인증 값 셋팅
 			conn.addRequestProperty("authorization", authValue);
@@ -106,28 +106,28 @@ public class GeoRouteSearch implements iConstant {
 		/**
 		 * 출발지 X좌표
 		 */
-		String SX;
+		public String SX;
 
 		/**
 		 * 출발지 Y좌표
 		 */
-		String SY;
+		public String SY;
 
 		/**
 		 * 도착지 X좌표
 		 */
-		String EX;
+		public String EX;
 		/**
 		 * 도착지 Y좌표
 		 */
-		String EY;
+		public String EY;
 
 		/**
 		 * 경로 탐색 종류( Option, default 값 RPTYPE=0)
 			1. 자동차 길찾기 (RPTYPE=0)
 			2. 대중교통 길찾기 (RPTYPE=1)
 		 */
-		String RPTYPE;
+		public String RPTYPE;
 
 
 		/**
@@ -143,7 +143,7 @@ public class GeoRouteSearch implements iConstant {
 				8. UTMK (COORDTYPE = 7)
 		 *
 		 */
-		String COORDTYPE;
+		public String COORDTYPE;
 
 		/**
 		 * 경유지 첫번째 X 좌표 (Option, 자동차 길찾기만 적용)
@@ -193,12 +193,12 @@ public class GeoRouteSearch implements iConstant {
 				4. 버스+지하철 (PRIORITY = 3) : 사용하지 않음
 		 *
 		 */
-		String PRIORITY;
+		public String PRIORITY;
 
 		/**
 		 * “yyyyMMddHHmmssSSS” 포맷의 요청 시간
 		 */
-		String timestamp;
+		public String timestamp;
 		
 		// 자동차 경로탐색 우선 순위 
 		/**

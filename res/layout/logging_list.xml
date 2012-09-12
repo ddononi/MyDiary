@@ -17,7 +17,7 @@
         android:shadowDy="1"
         android:shadowRadius="1"
         android:id="@+id/title"
-        android:textColor="#f7f3f7"
+        android:textColor="#333"
         android:text="여행기록 내역"
         android:textSize="18dp" />
 
@@ -37,6 +37,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#00000000"
+        android:dividerHeight="1px"
+        android:divider="#888"   
         android:cacheColorHint="#00000000" />
 
 </LinearLayout>

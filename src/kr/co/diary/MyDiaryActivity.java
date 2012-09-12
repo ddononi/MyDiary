@@ -182,11 +182,11 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 			tr.setLayoutParams(params);
 			for (int day = 0; day < 7; day++) { // 한주의 날짜 7일
 				Button dayBtn = new Button(this);
-				dayBtn.setBackgroundResource(R.drawable.selector);
+				//dayBtn.setBackgroundResource(R.drawable.selector);
 				if (day == SUNDAY) { // 일요일이면 빨깡 색
 					dayBtn.setTextColor(Color.parseColor("#FF4406"));
 				} else if (day == SATURDAY) { // 토요일이면 파랑색
-					dayBtn.setTextColor(Color.parseColor("#002765"));
+					dayBtn.setTextColor(Color.parseColor("#A4CFFF"));
 				} else { // 평일이면 흰색
 					dayBtn.setTextColor(Color.parseColor("#111111"));
 				}
@@ -198,12 +198,17 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 				dayBtn.setLayoutParams(btnParams);
 				final int weekIndex = day;
 				dayBtn.setOnClickListener(new OnClickListener() {
-
+					
 					/**
 					 * 선택한 버튼 포커스 주기
 					 */
 					@Override
 					public void onClick(final View v) {
+				
+						// 빈 달력 공간이면
+						if( TextUtils.isEmpty( ((Button)v).getText().toString() ) ){
+							return;
+						}
 						v.setBackgroundColor(R.color.select);
 						// 이전 버튼 포커스 제거
 						if(preBtn != null){
@@ -221,6 +226,10 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 				dayBtn.setOnLongClickListener(new OnLongClickListener() {
 					@Override
 					public boolean onLongClick(final View v) {
+						// 빈 달력 공간이면
+						if( TextUtils.isEmpty( ((Button)v).getText().toString() ) ){
+							return false;
+						}
 						// 날짜를 클릭하면 선택한 년월일저장
 						selectedDay[0] = cal.get(Calendar.YEAR);
 						selectedDay[1] = cal.get(Calendar.MONTH);
@@ -320,7 +329,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		for (int i = 0; i < list.size(); i++) {
 			Button b = list.get(i);
 			b.setText("");
-			b.setBackgroundResource(R.drawable.selector);
+			b.setBackgroundColor(Color.parseColor("#00000000"));
 			b.setClickable(false);
 		}
 
@@ -810,9 +819,9 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 			try {
 				result = parseWeather();
 			} catch (ClientProtocolException e) {
-				Log.e(DEBUG_TAG, "Failed to register id (protocol): ", e);
+				Log.e(DEBUG_TAG, "Failed(protocol): ", e);
 			} catch (IOException e) {
-				Log.e(DEBUG_TAG, "Failed to register  i (io): ", e);
+				Log.e(DEBUG_TAG, "Failed (io): ", e);
 			} catch (Exception e) {
 				Log.e(DEBUG_TAG, "파일 업로드 에러", e);
 			}
