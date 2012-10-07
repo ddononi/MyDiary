@@ -30,7 +30,7 @@ import android.widget.Toast;
  *	녹음 전체 리스트
  *	전체 메모 리스트 참고
  */
-public class RecordListActivity extends BaseActivity
+public class RecordListActivity extends MyActivity
 implements IDiaryList {
 	private final ArrayList<RecordData> list = new ArrayList<RecordData>();
 	private RecordAdapter adapter;		// 로깅 커스텀 아답터

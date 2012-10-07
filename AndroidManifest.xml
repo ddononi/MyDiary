@@ -15,7 +15,10 @@
 	<!-- 녹음 설정을 위한 퍼미션 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>	    
 	<!-- sdcard에 접근하기 위한 퍼미션 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>	    	
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>	    
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />    	
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
@@ -29,25 +32,29 @@
             </intent-filter>
         </activity>
         <!--  메인 엑티비티 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MyDiaryActivity"></activity>        
+        <activity android:windowSoftInputMode="stateAlwaysHidden" android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name="MyDiaryActivity"></activity>        
         <!--  메모 엑티비티 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MemoActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name="MemoActivity"></activity>
         <!--  메모 리스트 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MemoListActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name="MemoListActivity"></activity>
         <!-- 전체 메모 리스트 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="MemoAllListActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name="MemoAllListActivity"></activity>
         <!--  설정 엑티비티 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name="SettingActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name="SettingActivity"></activity>
         <!--  스케쥴 엑티비티 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar"  android:name=".ScheduleListActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar"  android:name=".ScheduleListActivity"></activity>
         <!--  날씨 엑티비티  -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".WeatherActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name=".WeatherActivity"></activity>
         <!--  녹음 엑티비티 -->
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".RecordListActivity"></activity>        
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name=".RecordListActivity"></activity>        
 		<!--  map -->        
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".map.MapActivity"></activity>
-        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".LoggingListActivity"></activity>
-		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".map.RegMapActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name=".map.MapActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name=".LoggingListActivity"></activity>
+		<activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name=".map.RegMapActivity"></activity>
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name=".LoginActivity"></activity>
+		<activity android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar" android:name=".JoinActivity"></activity>
+        <!--  메인 엑티비티 -->
+        <activity android:screenOrientation="portrait"  android:theme="@android:style/Theme.NoTitleBar" android:name="UserListActivity"></activity> 		
 
         <receiver android:name=".AlarmReceiver" />
         <receiver android:name=".LoggingReceiver" />

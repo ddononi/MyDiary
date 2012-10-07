@@ -25,7 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ScheduleListActivity extends BaseActivity
+public class ScheduleListActivity extends MyActivity
 		implements IDiaryList {
 
 	private final ArrayList<Schedule> list = new ArrayList<Schedule>();

@@ -108,6 +108,21 @@
 			    android:layout_marginLeft="10px"
 			    android:text="알람" />
 			</LinearLayout>
+			
+		<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/share_schedule_btn"
+			android:textColor="#111111"
+			android:padding="10dp"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1"
+			android:shadowColor="#ffffff"
+			android:text="일정공유하기"	
+			android:onClick="mOnclick"
+	
+		 />				
 	 
 		<Button
 			android:layout_width="fill_parent"

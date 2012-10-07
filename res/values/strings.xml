@@ -49,7 +49,28 @@
 		<item>전체메모보기</item>
 		<item>일정추가</item>
 		<item>일정보기</item>
+		 <!-- 
 		<item>음성녹음</item>
-		<item>녹음리스트</item>		
+		<item>녹음리스트</item>
+			-->		
 	</string-array>	
+	
+
+	<string-array name="channel">
+		<item>전체보기</item>
+		<item>채널1</item>
+		<item>채널2</item>							
+	</string-array>
+	
+	<string-array name="sex">
+		<item>남자</item>
+		<item>여자</item>
+	</string-array>	
+	
+	<string-array name="major">
+		<item>컴퓨터소프트웨어학과</item>
+		<item>정보통신학과</item>
+	</string-array>		
+	
+	
 </resources>

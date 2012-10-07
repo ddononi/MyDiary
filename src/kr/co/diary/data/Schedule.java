@@ -13,6 +13,8 @@ public class Schedule {
 	private String startTime; // 시작시간
 	private String endTime; // 종료시간
 
+	private String name;	// 이름
+	
 	public int getIdx() {
 		return idx;
 	}
@@ -75,6 +77,14 @@ public class Schedule {
 
 	public void setStartTime(final String startTime) {
 		this.startTime = startTime;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

@@ -1,23 +1,42 @@
 package kr.co.diary;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Vector;
 
+import kr.co.diary.data.Schedule;
+import kr.co.diary.data.UserListData;
 import kr.co.diary.map.MapActivity;
 import kr.co.diary.map.RegMapActivity;
 import kr.co.myutils.MyUtils;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,6 +52,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -61,7 +81,7 @@ import android.widget.ViewSwitcher;
 /**
  * 달력 메인 엑티비티
  */
-public class MyDiaryActivity extends BaseActivity implements OnClickListener {
+public class MyDiaryActivity extends MyActivity implements OnClickListener {
 	// var
 	private ArrayList<Button> list; // 날짜 버튼들
 	// date
@@ -74,8 +94,9 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 	private TextView monthTV; // 상단 월 텍스트
 	private ProgressBar loadingBar; // 날씨에 보여줄 로딩바
 	private ViewSwitcher switcher; // 상단 월 에니메이션을 위한 뷰 스위쳐
-	private View preBtn;			// 이전 선택 버튼
+	private View preBtn; // 이전 선택 버튼
 
+	private ArrayList<String> users; // 일정 공유할 친구 인덱스
 	// animation
 	private Animation ani; // 버튼 에니메이션
 	// map & geo
@@ -145,6 +166,8 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		AsyncTaskWeather asyncWeather = new AsyncTaskWeather();
 		asyncWeather.execute();
 
+		// 공유 일정이 있는지 체크한다.
+		new AnsyncCheckShareScheduleTask().execute();
 	}
 
 	/**
@@ -164,7 +187,6 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		}
 
 	}
-
 
 	/**
 	 * 달력 생성 및 초기화
@@ -206,10 +228,11 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 					public void onClick(final View v) {
 						v.setBackgroundColor(R.color.select);
 						// 이전 버튼 포커스 제거
-						if(preBtn != null){
-							if(preBtn.getTag() != null){
-								preBtn.setBackgroundResource((Integer)preBtn.getTag());
-							}else{
+						if (preBtn != null) {
+							if (preBtn.getTag() != null) {
+								preBtn.setBackgroundResource((Integer) preBtn
+										.getTag());
+							} else {
 								preBtn.setBackgroundResource(R.drawable.selector);
 							}
 						}
@@ -244,6 +267,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 
 	/**
 	 * 날짜 선택시 선택 다이얼로그 띄우기
+	 * 
 	 * @param weekIndex
 	 * @param day
 	 */
@@ -255,7 +279,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 								+ day + "일 " + dayWeek[weekIndex] + "요일")
 				// 메뉴 항목
 				.setItems(R.array.todo_item,
-						// 다이얼로그 메뉴 선택시
+				// 다이얼로그 메뉴 선택시
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(final DialogInterface dialog,
@@ -289,18 +313,15 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 									intent.putExtra("selectedDay", selectedDay);
 									startActivity(intent);
 									break;
-								case 5: // 녹음 하기
-									RecordDialog recordDailog = new RecordDialog(
-											MyDiaryActivity.this);
-
-									recordDailog.show();
-									break;
-								case 6: // 녹음 리스트
-									intent = new Intent(MyDiaryActivity.this,
-											RecordListActivity.class);
-									startActivity(intent);
-									break;
-
+								/*
+								 * case 5: // 녹음 하기 RecordDialog recordDailog =
+								 * new RecordDialog( MyDiaryActivity.this);
+								 * 
+								 * recordDailog.show(); break; case 6: // 녹음 리스트
+								 * intent = new Intent(MyDiaryActivity.this,
+								 * RecordListActivity.class);
+								 * startActivity(intent); break;
+								 */
 								}
 							}
 						}).show();
@@ -407,6 +428,53 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 	}
 
 	/**
+	 * 일정을 체크해 달력에 색 강조해 주기
+	 */
+	private void initCheckSchedule() {
+		DBHelper dbhp = new DBHelper(this);
+		SQLiteDatabase db = dbhp.getReadableDatabase();
+		Cursor cursor = null;
+		// 년월일 조건검색
+		String date = cal.get(Calendar.YEAR) + "-"
+				+ String.format("%02d", cal.get(Calendar.MONTH) + 1);
+		Log.i(DEBUG_TAG, "date-->" + date);
+		String scheduelDate;
+		cursor = db.query(DBHelper.SCHEDULE_TABLE, null,
+				"substr(date_str, 1,7) = ? ", new String[] { date, }, null,
+				null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				scheduelDate = cursor.getString(cursor
+						.getColumnIndex("date_str"));
+				// list에 추가
+				String[] arr = scheduelDate.substring(0, 10).split("-");
+				scheduelDate = arr[2]; // 일정 날짜
+				Log.i(DEBUG_TAG, "scheduleDate" + arr[2]);
+				// 오늘날짜는 뺴고
+				if (Integer.valueOf(scheduelDate) == cal
+						.get(Calendar.DAY_OF_MONTH)) {
+					continue;
+				}
+
+				int searchDay = Integer.valueOf(scheduelDate);
+				for (Button btn : list) {
+					// 일정이 있으면 색강조
+					if (btn.getText().toString().length() > 0) { // 날짜가 있는 버튼만
+						if (Integer.valueOf(btn.getText().toString()) == searchDay) {
+							btn.setBackgroundResource(R.drawable.has_memo_selector);
+							btn.setTag(R.drawable.has_memo_selector);
+						}
+					}
+				}
+			} while (cursor.moveToNext());
+		}
+		// 디비를 닫아준다.
+		cursor.close();
+		db.close();
+
+	}
+
+	/**
 	 * 년(year) 선택 다이얼로그
 	 */
 	private void selectYear() {
@@ -438,6 +506,19 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 				}).show();
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == RESULT_OK) {
+			users = data.getStringArrayListExtra("sharedUsers");
+			for (int i = 0; i < users.size(); i++) {
+				Log.i("MyDiary", users.get(i));
+			}
+
+		}
+	}
+
 	/**
 	 * 일정 추가 다이얼로그
 	 */
@@ -451,6 +532,20 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		Button addBtn = (Button) dialog.findViewById(R.id.add_schedule_btn);
 		final EditText scheduleET = (EditText) dialog
 				.findViewById(R.id.schedule);
+
+		// 친구와 공유버튼
+		final Button shareBtn = (Button) dialog
+				.findViewById(R.id.share_schedule_btn);
+		shareBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MyDiaryActivity.this,
+						UserListActivity.class);
+				startActivityForResult(intent, 1);
+
+			}
+		});
+
 		// 일정추가 이벤트 처리
 		addBtn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -490,10 +585,12 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 						+ String.format("-%02d %02d:%02d",
 								Integer.valueOf(day), endHour, endMin); // 종료 시간
 				int alarm = tb.isChecked() ? 1 : 0;
+
 				cv.put("todo", schedule);
 				cv.put("s_time", startTime);
 				cv.put("e_time", endTime);
 				cv.put("alarm", alarm);
+				cv.put("date_str", startTime);
 				Log.i(DEBUG_TAG, "insert data-->" + schedule + "   "
 						+ startTime + "  " + endTime + "   " + alarm);
 				// db에 정상적으로 추가 되었으면 토스트를 굽는다.
@@ -503,7 +600,14 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 					dialog.dismiss(); // 정상적으로 처리되면 다이얼로그를 닫는다.
 				}
 				db.close();
+
+				if(users.size() > 0){
+					// 서버에 일정 공유 업로드
+					AnsyncUploadSharedScheduleTask task = new AnsyncUploadSharedScheduleTask();
+					task.execute(schedule, startTime, endTime);
+				}
 			}
+
 		});
 
 		dialog.show();
@@ -566,7 +670,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 
 	/**
 	 * 현재 위치를 폰의 위치 수신상태따라 gps>wifi>network 순으로 가져온다.
-	 *
+	 * 
 	 * @param msgFlag
 	 * @return 위치 좌표 double[]
 	 */
@@ -632,6 +736,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		// 서비스 구동
 		super.onResume();
 		initCheckMemo();
+		initCheckSchedule();
 	}
 
 	/**
@@ -686,72 +791,65 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		return null;
 	}
 
-    /** 옵션 메뉴 만들기 */
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu){
-    	super.onCreateOptionsMenu(menu);
-    	menu.add(0,1,0, "현재위치로깅");
-    	menu.add(0,2,0, "지도위치로깅");
-    	menu.add(0,3,0, "로깅지도보기");
-    	menu.add(0,4,0, "로깅내역");
-    	menu.add(0,5,0, "날씨보기");
-    	menu.add(0,6,0, "설정");
+	/** 옵션 메뉴 만들기 */
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		menu.add(0, 1, 0, "현재위치로깅");
+		menu.add(0, 2, 0, "지도위치로깅");
+		menu.add(0, 3, 0, "로깅지도보기");
+		menu.add(0, 4, 0, "로깅내역");
+		menu.add(0, 6, 0, "설정");
 
-    	//menu.add(0,4,0, "도움말");
-    	//item.setIcon();
-    	return true;
-    }
+		// menu.add(0,4,0, "도움말");
+		// item.setIcon();
+		return true;
+	}
 
-    /** 옵션 메뉴 선택에 따라 해당 처리를 해줌 */
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item){
-    	Intent intent = null;
-    	switch(item.getItemId()){
-	    	case 1:	// 내 위치 추가
-	    		addMyPlace();
-	    		break;
-	    	case 2:	// 지도에서 위치 추가
-	    		intent = new Intent(MyDiaryActivity.this,
-	    				RegMapActivity.class);
-	    		double[] geo = getLocation();
-	    		if(geo !=null){	// 현재좌표가 있으면 인텐트에 싣는다.
-		    		intent.putExtra("lat", geo[0]);
-		    		intent.putExtra("lon", geo[1]);
-	    		}
-	    		startActivity(intent);
-	    		break;
-	    	case 3:	// 내 위치 로깅 내역 지도  보기
-	    		intent =new Intent(MyDiaryActivity.this,
-	    				MapActivity.class);
-	    		geo = getLocation();
-	    		if(geo !=null){	// 현재좌표가 있으면 인텐트에 싣는다.
-		    		intent.putExtra("lat", geo[0]);
-		    		intent.putExtra("lon", geo[1]);
-	    		}
-	    		startActivity(intent);
-	    		break;
-    		case 4:		// 로깅내역들 보기
-				intent = new Intent(getBaseContext(), LoggingListActivity.class);
-				startActivity(intent);
-				return true;
-    		case 5:		// 날씨보기
-				intent = new Intent(getBaseContext(), WeatherActivity.class);
-				startActivity(intent);
-				return true;
-    		case 6:		// 설정 프리퍼런스엑티비티
-				intent = new Intent(getBaseContext(), SettingActivity.class);
-				startActivity(intent);
-				return true;
-				/*
-			case 5:		// 도움말 액티비티로 이동
-				intent = new Intent(getBaseContext(), HelpActivity.class);
-				startActivity(intent);	// 특별한 요청코드는 필요없음
-				return true;
-				*/
+	/** 옵션 메뉴 선택에 따라 해당 처리를 해줌 */
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		Intent intent = null;
+		switch (item.getItemId()) {
+		case 1: // 내 위치 추가
+			addMyPlace();
+			break;
+		case 2: // 지도에서 위치 추가
+			intent = new Intent(MyDiaryActivity.this, RegMapActivity.class);
+			double[] geo = getLocation();
+			if (geo != null) { // 현재좌표가 있으면 인텐트에 싣는다.
+				intent.putExtra("lat", geo[0]);
+				intent.putExtra("lon", geo[1]);
+			}
+			startActivity(intent);
+			break;
+		case 3: // 내 위치 로깅 내역 지도 보기
+			intent = new Intent(MyDiaryActivity.this, MapActivity.class);
+			geo = getLocation();
+			if (geo != null) { // 현재좌표가 있으면 인텐트에 싣는다.
+				intent.putExtra("lat", geo[0]);
+				intent.putExtra("lon", geo[1]);
+			}
+			startActivity(intent);
+			break;
+		case 4: // 로깅내역들 보기
+			intent = new Intent(getBaseContext(), LoggingListActivity.class);
+			startActivity(intent);
+			return true;
 
-    	}
-    	return false;
-    }
+		case 6: // 설정 프리퍼런스엑티비티
+			intent = new Intent(getBaseContext(), SettingActivity.class);
+			startActivity(intent);
+			return true;
+			/*
+			 * case 5: // 도움말 액티비티로 이동 intent = new Intent(getBaseContext(),
+			 * HelpActivity.class); startActivity(intent); // 특별한 요청코드는 필요없음
+			 * return true;
+			 */
+
+		}
+		return false;
+	}
 
 	@Override
 	protected void onStop() {
@@ -769,7 +867,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 
 	/**
 	 * 종료 confirm 다이얼로그 창
-	 *
+	 * 
 	 * @param context
 	 */
 	public void finishDialog(final Context context) {
@@ -879,4 +977,298 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 
 	}
 
+	/**
+	 * 일정공유 업로드
+	 */
+	private class AnsyncUploadSharedScheduleTask extends AsyncTask<String, String, Boolean> {
+		private ProgressDialog dialog;
+		/**
+		 * 쓰레드 처리가 완료되면..
+		 */
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// 다이얼로그 닫기
+			if(dialog.isShowing()){
+				dialog.dismiss();
+			}
+		
+			if (result != null && result == true) { // 서버 전송 결과에 따라 메세지를 보여준다.
+				Toast.makeText(MyDiaryActivity.this, users.size() + "명에게 일정 공유신청을 했습니다.",
+						Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(MyDiaryActivity.this, "일정공유를 하지 못했습니다.",
+						Toast.LENGTH_SHORT).show();
+			}
+			users = null;
+		}
+
+		/**
+		 * 쓰레드 작업 처리전
+		 */
+		@Override
+		protected void onPreExecute() { // 전송전 프로그래스 다이얼로그로 전송중임을 사용자에게 알린다.
+			dialog = ProgressDialog.show(MyDiaryActivity.this, "전송중", "잠시만 기다려주세요");
+		}
+
+		@Override
+		protected void onProgressUpdate(final String... values) {
+		}
+
+		@Override
+		protected Boolean doInBackground(final String... params) { // 전송중
+			boolean result = false;
+			String userParam = "";
+			for (String user : users) {
+				userParam = userParam + "," + user;
+			}
+
+			if (users.size() > 0) {
+				userParam = userParam.substring(1);
+			}
+			// http 로 보낼 이름 값 쌍 컬랙션
+			Vector<NameValuePair> vars = new Vector<NameValuePair>();
+			try {
+
+				// HTTP post 메서드를 이용하여 데이터 업로드 처리
+				vars.add(new BasicNameValuePair("users", userParam)); // 공유할 유저
+																		// 인덱스
+				vars.add(new BasicNameValuePair("regUser", ""+myIndex)); 	// 내 인덱스				
+				vars.add(new BasicNameValuePair("todo", params[0])); // 내용
+				vars.add(new BasicNameValuePair("start_time", params[1])); // 시작시간
+				vars.add(new BasicNameValuePair("end_time", params[2])); // 종료시간
+				HttpPost request = new HttpPost(SHARE_SCHEDULE);
+				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(vars,
+						"UTF-8");
+				request.setEntity(entity);
+				ResponseHandler<String> responseHandler = new BasicResponseHandler();
+				HttpClient client = new DefaultHttpClient();
+				final String responseBody = client.execute(request,
+						responseHandler); // 전송
+				Log.i("debug", "responseBody : " + responseBody);
+				if (responseBody.contains("ok")) { // 정상이면 내 인덱스 번호 추출
+					result = true;
+				}
+				return result;
+			} catch (Exception e) {
+				return false;
+			}
+		}
+
+	}
+	
+	
+	private class AnsyncCheckShareScheduleTask extends AsyncTask<Void, String, Boolean> {
+		private ProgressDialog dialog;
+		private ArrayList<Schedule> arrayList;
+		/**
+		 * 쓰레드 처리가 완료되면..
+		 */
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// 다이얼로그 닫기
+			if(dialog.isShowing()){
+				dialog.dismiss();
+			}
+		
+			if (result != null && result == true) { // 서버 전송 결과에 따라 메세지를 보여준다.
+				if(arrayList.size() <= 0){
+					return;
+				}
+				// 공유 일정 선택 다이얼로그를 만들어 준다.
+				String[] schedueleArray = new String[arrayList.size()];
+				for(int i=0; i <arrayList.size(); i++){
+					schedueleArray[i] = "내용 : " + arrayList.get(i).getTodo() +"\n" 
+											+ "날짜 : " + arrayList.get(i).getStartTime() +"\n\n"
+											+ "신청자 : " + arrayList.get(i).getName();
+				}
+				
+				new AlertDialog.Builder(MyDiaryActivity.this).setTitle("공유하기선택").setItems(schedueleArray, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// 디비에 일정 저장 처리
+						DBHelper dbhp = new DBHelper(MyDiaryActivity.this); // 도우미 클래스
+						SQLiteDatabase db = dbhp.getWritableDatabase(); // 읽기모도로 해주자
+						ContentValues cv = new ContentValues();
+						Schedule data = arrayList.get(which);
+						cv.put("todo", data.getTodo());
+						cv.put("s_time", data.getStartTime());
+						cv.put("e_time", data.getEndTime());
+						cv.put("alarm", 0);
+						cv.put("date_str", data.getStartTime());
+						// db에 정상적으로 추가 되었으면 토스트를 굽는다.
+						if (db.insert(DBHelper.SCHEDULE_TABLE, null, cv) > 0) {
+							Toast.makeText(MyDiaryActivity.this, "일정이 추가되었습니다.",
+									Toast.LENGTH_SHORT).show();
+							dialog.dismiss(); // 정상적으로 처리되면 다이얼로그를 닫는다.
+							// 공유 일정 확인 체크
+							new AnsyncShareLookTask().execute(String.valueOf(data.getIdx()));
+						}
+						db.close();
+						
+						
+					}
+				}).create().show();
+				
+			} else {
+				// Toast.makeText(MyDiaryActivity.this, "일정공유를 하지 못했습니다.",
+				//		Toast.LENGTH_SHORT).show();
+			}
+			users = null;
+		}
+
+		/**
+		 * 쓰레드 작업 처리전
+		 */
+		@Override
+		protected void onPreExecute() { // 전송전 프로그래스 다이얼로그로 전송중임을 사용자에게 알린다.
+			dialog = ProgressDialog.show(MyDiaryActivity.this, "전송중", "잠시만 기다려주세요");
+		}
+
+		@Override
+		protected void onProgressUpdate(final String... values) {
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			if (!checkNetWork(true)) { // 네트워크 상태 체크
+				return false;
+			}
+
+			try {
+				// 서버에서 xml 을 받아와 파싱처리
+				arrayList = (ArrayList<Schedule>)processShareScheduleXML();
+				return true;
+			}catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+
+		}
+
+	}	
+	
+	/**
+	 * 일정xml 을 파싱하여 list 에 담은후 handler에 list를 넣어준다.
+	 * @return
+	 * @throws XmlPullParserException
+	 * @throws IOException
+	 */
+	private List<Schedule> processShareScheduleXML() throws XmlPullParserException, IOException {
+	    XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+	    XmlPullParser parser = factory.newPullParser();
+	    InputStreamReader isr = null;
+	    BufferedReader br = null;
+		List<Schedule> list = new ArrayList<Schedule>();
+	    // namespace 지원
+	    factory.setNamespaceAware(true);
+
+	    URL url = new URL(SHARE_CHECK_URL + "&index="  +myIndex);
+	    URLConnection conn = url.openConnection();
+	    conn.setReadTimeout(2000);
+	    conn.setConnectTimeout(2000);
+	    conn.setDoInput(true);
+	    conn.setDoOutput(true);
+		try{
+		    isr = new InputStreamReader(conn.getInputStream(), "UTF-8");
+		    br = new BufferedReader(isr);
+		    StringBuilder xml = new StringBuilder();
+		    String line = "";
+		    while((line = br.readLine()) != null){
+		    	xml.append(line);
+		    }
+		    
+		    String decodeXMl = URLDecoder.decode(xml.toString());
+		    Log.i("decodeXMl", decodeXMl);
+		    if(decodeXMl.contains("﻿no shareList")){
+		    	return null;
+		    }
+
+		    decodeXMl = decodeXMl.substring(decodeXMl.indexOf("<"), decodeXMl.lastIndexOf(">") + 1);
+		    parser.setInput(new StringReader(decodeXMl));
+			int eventType = -1;
+
+			Schedule data = null;
+			Log.i("dialy", "decodeXMl " + decodeXMl);
+			while(eventType != XmlResourceParser.END_DOCUMENT){	// 문서의 마지막이 아닐때까지
+				if(eventType == XmlResourceParser.START_TAG){				// 이벤트가 시작태그면
+					String strName = parser.getName();
+					if(strName.contains("schedule")){								// 스케쥴 root
+						data = new Schedule();
+					}else if(strName.equals("index")){								// 인덱스
+						data.setIdx(Integer.valueOf(parser.nextText()));	
+					}else if(strName.equals("name")){								// 이름
+						data.setName(parser.nextText());								
+					}else if(strName.equals("startTime")){							// 시작 시간
+						data.setStartTime(parser.nextText());
+					}else if(strName.equals("endTime")){
+						data.setEndTime(parser.nextText());
+					}else if(strName.equals("todo")){
+						data.setTodo(parser.nextText());
+						list.add(data);
+						Log.i("dialy", "added");
+					}
+				}
+				eventType = parser.next();	// 다음이벤트로..
+			}
+		}finally{
+			if(isr != null){
+				isr.close();
+			}
+
+			if(br != null){
+				br.close();
+			}
+		}
+		return list;
+	}	
+	
+	/**
+	 * 일정공유 업로드
+	 */
+	private class AnsyncShareLookTask extends AsyncTask<String, String, Boolean> {
+		private ProgressDialog dialog;
+		/**
+		 * 쓰레드 처리가 완료되면..
+		 */
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// 다이얼로그 닫기
+			if(dialog.isShowing()){
+				dialog.dismiss();
+			}
+
+		}
+
+		/**
+		 * 쓰레드 작업 처리전
+		 */
+		@Override
+		protected void onPreExecute() { // 전송전 프로그래스 다이얼로그로 전송중임을 사용자에게 알린다.
+			dialog = ProgressDialog.show(MyDiaryActivity.this, "전송중", "잠시만 기다려주세요");
+		}
+
+		@Override
+		protected void onProgressUpdate(final String... values) {
+		}
+
+		@Override
+		protected Boolean doInBackground(final String... params) { // 전송중
+			boolean result = false;
+			try {
+				HttpGet request = new HttpGet(LOOK_CHECK_URL + "&index=" + params[0] );
+				ResponseHandler<String> responseHandler = new BasicResponseHandler();
+				HttpClient client = new DefaultHttpClient();
+				final String responseBody = client.execute(request, responseHandler); // 전송
+				Log.i("debug", "responseBody : " + responseBody);
+				if (responseBody.contains("ok")) { // 정상이면 내 인덱스 번호 추출
+					result = true;
+				}
+				return result;
+			} catch (Exception e) {
+				return false;
+			}
+		}
+
+	}	
+	
 }

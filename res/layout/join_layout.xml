@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/bg"      
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+        <!-- 아이디 -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:tag="bold"
+            android:text="회원가입"
+            android:textColor="#000"
+            android:textSize="25sp" />
+       
+
+        <TextView
+            style="@style/label"
+            android:tag="bold"
+            android:text="이름 : " />
+
+        <EditText
+            android:id="@+id/name"
+            style="@style/input"
+            android:hint="이름을 입력하세요"
+            android:inputType="text" />
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"            
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="#e5e5e5" />      
+                    
+        <!-- 아이디 -->
+
+        <TextView
+            style="@style/label"
+            android:tag="bold"
+            android:text="아이디 " />
+
+        <EditText
+            android:id="@+id/join_id"
+            style="@style/input"
+            android:hint="아이디를 입력하세요"
+            android:inputType="textPersonName" />
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"            
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="#e5e5e5" />
+
+        <!-- 비밀번호 -->
+
+        <TextView
+            style="@style/label"
+            android:tag="bold"
+            android:text="비밀번호" />
+
+        <EditText
+            android:id="@+id/join_pwd"
+            style="@style/input"
+            android:hint="비밀번호를 입력하세요"
+            android:inputType="textPassword" />
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"            
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="#e5e5e5" />
+
+        <!-- 비밀번호 확인 -->
+
+        <TextView
+            style="@style/label"
+            android:tag="bold"
+            android:text="비밀번호 확인" />
+
+        <EditText
+            android:id="@+id/join_re_pwd"
+            style="@style/input"
+            android:hint="비밀번호를 입력하세요"
+            android:inputType="textPassword" />
+
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"            
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="#e5e5e5" />
+         
+
+        <!-- 등록 -->
+
+        <Button
+            android:layout_margin="10dp"
+            android:id="@+id/register_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/btn"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            android:text="가입하기" />
+    </LinearLayout>
+
+</ScrollView>

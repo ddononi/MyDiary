@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 
-public class IntroActivity extends BaseActivity {
+public class IntroActivity extends MyActivity {
 	String cellNum = "";
 
     @Override
@@ -18,7 +18,7 @@ public class IntroActivity extends BaseActivity {
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
 		  if ( event.getAction() == MotionEvent.ACTION_DOWN ){
-			 Intent intent =  new Intent(IntroActivity.this, MyDiaryActivity.class);
+			 Intent intent =  new Intent(IntroActivity.this, LoginActivity.class);
 			 startActivity(intent);
 			 return true;
 		  }

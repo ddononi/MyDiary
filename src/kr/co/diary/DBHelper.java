@@ -32,7 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		// 일정 테이블 만들기
 		// 인덱스, todo, 시작시간, 종료시간, 태그 칼라, 알람, 알람발생여부
         db.execSQL("create table "+ SCHEDULE_TABLE
-        		+ " ( no integer primary key autoincrement, date TEXT, "
+        		+ " ( no integer primary key autoincrement, date TEXT, date_str TEXT, "
         		+ " todo TEXT, s_time TEXT, e_time TEXT, tag_color TEXT, alarm integer," +
         		" is_alarming integer );");
         // 위치저장 테이블 만들기

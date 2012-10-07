@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import kr.co.diary.BaseActivity;
+import kr.co.diary.MyActivity;
 import kr.co.diary.DBHelper;
 import kr.co.diary.R;
 import kr.co.diary.data.Logging;
@@ -264,7 +264,7 @@ public class MapActivity extends NMapActivity {
     	mOverlayManager.clearOverlays();
         int count = cursor.getCount();
 		// Markers for POI item
-        Log.i(BaseActivity.DEBUG_TAG, "count-->" +count);
+        Log.i(MyActivity.DEBUG_TAG, "count-->" +count);
 		int markerId = NMapPOIflagType.PIN;
 		// set POI data
 		NMapPOIdata poiData = new NMapPOIdata(count, mMapViewerResourceProvider);
@@ -281,7 +281,7 @@ public class MapActivity extends NMapActivity {
 			 addressList.add(" Tag : " + logMessage + "\n\n Date: " + date );				// 주소을 저장해 주고 말풍선 클릭시 보여준다.
 			 poiData.addPOIitem(lon, lat, logMessage, markerId, itemId); 	// 아이템 추가
 			 itemId++;
-			 Log.i(BaseActivity.DEBUG_TAG, "lat-->" + lat + "  lon-->" + lon);
+			 Log.i(MyActivity.DEBUG_TAG, "lat-->" + lat + "  lon-->" + lon);
         }
 		cursor.close();
 		poiData.endPOIdata();	// 오버레이를 닫아주자
