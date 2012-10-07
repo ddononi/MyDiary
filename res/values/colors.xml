@@ -8,7 +8,9 @@
     <color name="month_normal">#333333</color>
     <color name="month_drag_active_color">#ff4406</color>        
     
-    <color name="memo_select">#44FEEC44</color>
+    <color name="memo_select">#662EFF4D</color>
+    <color name="shcedule_select">#662ECFFF</color>
+    
 	<color name="list_focused">#9ac02f</color>
     <color name="white">#FFFFFF</color>
     <color name="transparent_background">#00000000</color>  

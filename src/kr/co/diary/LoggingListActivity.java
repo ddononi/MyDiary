@@ -29,7 +29,7 @@ import android.widget.Toast;
  * @author ddononi
  *
  */
-public class LoggingListActivity extends BaseActivity
+public class LoggingListActivity extends MyActivity
 implements IDiaryList {
 	private final ArrayList<Logging> list = new ArrayList<Logging>();
 	private LoggingAdapter adapter;		// 로깅 커스텀 아답터

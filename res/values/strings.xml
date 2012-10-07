@@ -31,6 +31,17 @@
         <item>50</item>
     </string-array>  
     
+	<string-array name="todo_item">
+		<item>메모하기</item>
+		<item>메모보기</item>
+		<item>전체메모보기</item>
+		<item>일정추가</item>
+		<item>일정보기</item>
+		<item>전체일정</item>		
+		<item>음성녹음</item>
+		<item>녹음리스트</item>		
+	</string-array>	
+	
 	<string-array name="local_list">
 		<item>서울</item>
 		<item>경기</item>
@@ -43,13 +54,16 @@
 		<item>제주</item>
 	</string-array>
 	
-	<string-array name="todo_item">
-		<item>메모하기</item>
-		<item>메모보기</item>
-		<item>전체메모보기</item>
-		<item>일정추가</item>
-		<item>일정보기</item>
-		<item>음성녹음</item>
-		<item>녹음리스트</item>		
+	<string-array name="local_list_value">
+		<item>seoul</item>
+		<item>gyeonggi</item>
+		<item>Chungcheongbukdo</item>
+		<item>Chungcheongnamdo</item>
+		<item>Jeollanamdo</item>
+		<item>Jeollabukdo</item>
+		<item>Gangwondo</item>
+		<item>Gyeongsangbukdo</item>
+		<item>jeju</item>
 	</string-array>	
+		
 </resources>

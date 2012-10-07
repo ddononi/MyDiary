@@ -14,9 +14,9 @@ import android.widget.TextView;
 /**
  *	일정 리스트에 설정할 어댑터 클래스
  */
-public class ScheduleAdapter extends BaseAdapter {
+public class ScheduleAllAdapter extends BaseAdapter {
 	private final ArrayList<?> list;
-	public ScheduleAdapter(final ArrayList<?> list) {
+	public ScheduleAllAdapter(final ArrayList<?> list) {
 		this.list = list;
 	}
 
@@ -50,7 +50,7 @@ public class ScheduleAdapter extends BaseAdapter {
 		TextView itemTV = (TextView)item.findViewById(R.id.todo);
 		ImageView imageIV = (ImageView)item.findViewById(R.id.alarm_img);
 		// 엘리먼트에 값을 set해준다,
-		timeTV.setText(sche.getStartTime().substring(14) + " ~ "+ sche.getEndTime().substring(14));
+		timeTV.setText(sche.getStartTime() + " ~ "+ sche.getEndTime().substring(14));
 		itemTV.setText(sche.getTodo());
 		if(sche.getAlarm()==1){	// 알람이 설정되어 있으면 아이콘을 보여준다.
 			imageIV.setVisibility(View.VISIBLE);

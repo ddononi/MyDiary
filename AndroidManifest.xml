@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kr.co.diary"
-    android:versionCode="3"
-    android:versionName="1.2" >
+    android:versionCode="4"
+    android:versionName="1.2.1" >
 
     <uses-sdk android:minSdkVersion="8" />
     <!-- 지도를 위한 퍼미션 -->
@@ -25,6 +25,7 @@
             android:name=".MyDiaryActivity" android:screenOrientation="portrait" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
+	            <category android:name="android.intent.category.LAUNCHER" />                
             </intent-filter>
         </activity>
         <!--  메모 엑티비티 -->
@@ -37,6 +38,8 @@
         <activity android:theme="@android:style/Theme.NoTitleBar" android:name="SettingActivity"></activity>
         <!--  스케쥴 엑티비티 -->
         <activity android:theme="@android:style/Theme.NoTitleBar"  android:name=".ScheduleListActivity"></activity>
+        <!--  스케쥴 엑티비티 -->
+        <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".ScheduleAllListActivity"></activity>        
         <!--  날씨 엑티비티  -->
         <activity android:theme="@android:style/Theme.NoTitleBar" android:name=".WeatherActivity"></activity>
         <!--  녹음 엑티비티 -->

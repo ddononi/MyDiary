@@ -25,11 +25,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ScheduleListActivity extends MyActivity
+public class ScheduleAllListActivity extends MyActivity
 		implements IDiaryList {
 
 	private final ArrayList<Schedule> list = new ArrayList<Schedule>();
-	private ScheduleAdapter adapter;	// 메모 커스텀 아답터
+	private ScheduleAllAdapter adapter;	// 메모 커스텀 아답터
 
 	private ListView scheduleList;		// 스케쥴 리스트뷰
     @Override
@@ -54,19 +54,16 @@ public class ScheduleListActivity extends MyActivity
         setArrayList(date);
 
         TextView titleTV = (TextView)findViewById(R.id.title);
-		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy년 MM월 dd일");
-        titleTV.setText(sdf2.format(cal.getTime()) + " 일정");
+        titleTV.setText("전체 일정");
 
         scheduleList = (ListView)findViewById(R.id.list);
-        adapter = new ScheduleAdapter(list);
+        adapter = new ScheduleAllAdapter(list);
         scheduleList.setAdapter(adapter);
         // 메모 리스트 이벤트 처리
         scheduleList.setOnItemClickListener(this);
         scheduleList.setOnItemLongClickListener(this);
         setListAnimation();
     }
-    
-    
 
 	/**
 	 *	리스트 에니메이션 설정
@@ -101,7 +98,7 @@ public class ScheduleListActivity extends MyActivity
 		Schedule sc =null;
 		// 년월일 조건검색 시작시간순으로
 		cursor = db.query(DBHelper.SCHEDULE_TABLE, null,
-				"substr(s_time, 1,10) = ? ", new String[]{date, }, null, null, "s_time asc");
+				null, null, null, null, "no desc");
 		if(cursor.getCount() <= 0){	// 내역이 없으면 끝낸다.
 			Toast.makeText(this, "내역이 없습니다.", Toast.LENGTH_SHORT).show();
 			finish();
@@ -131,11 +128,11 @@ public class ScheduleListActivity extends MyActivity
 	 */
 	@Override
 	public void onItemClick(final AdapterView<?> av, final View v, final int pos, final long arg3) {
-		Adapter adpater = av.getAdapter();							// 아답터를 얻어와서
-		Schedule sche = (Schedule)adpater.getItem(pos);		// 해당 스케쥴 객체를 억는다.
+		Adapter adpater = av.getAdapter();			// 아답터를 얻어와서
+		Schedule sche = (Schedule)adpater.getItem(pos);		// 해당 메모 객체를 억는다.
 		sche.getIdx();
 		new AlertDialog.Builder(this).setTitle("일정내용")
-			.setMessage(sche.getTodo()).create().show();
+			.setMessage(sche.getTodo()).create().show();		
 	}
 
 	/**
@@ -157,7 +154,7 @@ public class ScheduleListActivity extends MyActivity
 				Schedule sche = (Schedule)adpater.getItem(position);		// 해당 메모 객체를 억는다.
 				int index = sche.getIdx();					// 인덱스 번호
 				if( deleteItem(index) > 0){	// 삭제가 정상적으로  처리되엇으면
-					Toast.makeText(ScheduleListActivity.this,
+					Toast.makeText(ScheduleAllListActivity.this,
 							"삭제되었습니다.", Toast.LENGTH_SHORT).show();
 					list.remove(position);				 // 리스트에서도 제거해줌
 					adapter.notifyDataSetChanged();	 //	아답터에게 데이터 변경됨을 통지

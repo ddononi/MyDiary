@@ -6,10 +6,10 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import kr.co.diary.map.MapActivity;
 import kr.co.diary.map.RegMapActivity;
-import kr.co.myutils.MyUtils;
 
 import org.apache.http.client.ClientProtocolException;
 import org.xmlpull.v1.XmlPullParser;
@@ -61,7 +61,7 @@ import android.widget.ViewSwitcher;
 /**
  * 달력 메인 엑티비티
  */
-public class MyDiaryActivity extends BaseActivity implements OnClickListener {
+public class MyDiaryActivity extends MyActivity implements OnClickListener {
 	// var
 	private ArrayList<Button> list; // 날짜 버튼들
 	// date
@@ -114,9 +114,6 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
 
-		if (!MyUtils.checkVersion("mydiary", "1.1")) {
-			finish();
-		}
 		cal = Calendar.getInstance();
 		// 시스템 시간으로 설정
 		cal.setTimeInMillis(System.currentTimeMillis());
@@ -138,9 +135,10 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		nextBtn.setOnClickListener(this);
 		swticherMonthTV.setOnClickListener(this);
 
-		initElem(); // 날짜 table 설정
-		setDate(); // 날짜 설정
-		initCheckMemo(); // 메모 체크
+		initElem();					 // 날짜 table 설정
+		setDate();					 // 날짜 설정
+		initCheckMemo(); 		 // 메모 체크
+		initCheckSchedule();		 // 일정 체크
 		ani = AnimationUtils.loadAnimation(this, R.anim.alpha); // 날씨 정보 가져오기
 		AsyncTaskWeather asyncWeather = new AsyncTaskWeather();
 		asyncWeather.execute();
@@ -289,13 +287,18 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 									intent.putExtra("selectedDay", selectedDay);
 									startActivity(intent);
 									break;
-								case 5: // 녹음 하기
+								case 5: // 전체일정보기
+									intent = new Intent(MyDiaryActivity.this,
+											ScheduleAllListActivity.class);
+									startActivity(intent);
+									break;									
+								case 6: // 녹음 하기
 									RecordDialog recordDailog = new RecordDialog(
 											MyDiaryActivity.this);
 
 									recordDailog.show();
 									break;
-								case 6: // 녹음 리스트
+								case 7: // 녹음 리스트
 									intent = new Intent(MyDiaryActivity.this,
 											RecordListActivity.class);
 									startActivity(intent);
@@ -405,6 +408,52 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		db.close();
 
 	}
+	
+	/**
+	 * 메모날짜를 체크해 달력에 색 강조해 주기
+	 */
+	private void initCheckSchedule() {
+		DBHelper dbhp = new DBHelper(this);
+		SQLiteDatabase db = dbhp.getReadableDatabase();
+		Cursor cursor = null;
+		// 년월일 조건검색
+		String date = cal.get(Calendar.YEAR) + "-"
+				+ String.format("%02d", cal.get(Calendar.MONTH) + 1);
+		Log.i(DEBUG_TAG, "scheduleDate-->" + date);
+		String scheduleDate;
+		cursor = db.query(DBHelper.SCHEDULE_TABLE, null, "substr(yyyyMMdd, 1,7) = ? ",
+				new String[] { date, }, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				scheduleDate = cursor.getString(cursor.getColumnIndex("yyyyMMdd"));
+				// list에 추가
+				String[] arr = scheduleDate.substring(0, 10).split("-");
+				scheduleDate = arr[2]; // 메모한 날짜 뱨오기
+				Log.i(DEBUG_TAG, "schedule~~~~~~" + arr[2]);
+				// 오늘날짜는 뺴고
+				if (Integer.valueOf(scheduleDate) == cal.get(Calendar.DAY_OF_MONTH)) {
+					continue;
+				}
+				int searchDay = Integer.valueOf(scheduleDate);
+				for (Button btn : list) {
+					Log.i(DEBUG_TAG, "schedulz22222zzz");			
+					// 메모가 있으면 색강조
+					if (btn.getText().toString().length() > 0) { // 날짜가 있는 버튼만
+						Log.i(DEBUG_TAG, "schedulzzzz");						
+						if (Integer.valueOf(btn.getText().toString()) == searchDay) {
+							Log.i(DEBUG_TAG, "scheduleDate day-->" + searchDay);
+							btn.setBackgroundResource(R.drawable.has_schedule_selector);
+							btn.setTag(R.drawable.has_schedule_selector);
+						}
+					}
+				}
+			} while (cursor.moveToNext());
+		}
+		// 디비를 닫아준다.
+		cursor.close();
+		db.close();
+
+	}	
 
 	/**
 	 * 년(year) 선택 다이얼로그
@@ -480,7 +529,12 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 				int endMin = ((TimePicker) sv.findViewById(R.id.e_time))
 						.getCurrentMinute();
 				ToggleButton tb = (ToggleButton) sv.findViewById(R.id.alarm);
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				Calendar cal  = Calendar.getInstance();
+	            cal.set(Calendar.YEAR, selectedDay[0]);
+	            cal.set(Calendar.MONTH, selectedDay[1]) ;
+	            cal.set(Calendar.DAY_OF_MONTH, selectedDay[2]);			
+	            
 				String date = sdf.format(cal.getTime());
 				String startTime = date
 						+ String.format("-%02d %02d:%02d",
@@ -490,6 +544,8 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 						+ String.format("-%02d %02d:%02d",
 								Integer.valueOf(day), endHour, endMin); // 종료 시간
 				int alarm = tb.isChecked() ? 1 : 0;
+	
+				cv.put("yyyyMMdd", sdf.format(cal.getTime()));				
 				cv.put("todo", schedule);
 				cv.put("s_time", startTime);
 				cv.put("e_time", endTime);
@@ -501,6 +557,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 					Toast.makeText(MyDiaryActivity.this, "일정이 추가되었습니다.",
 							Toast.LENGTH_SHORT).show();
 					dialog.dismiss(); // 정상적으로 처리되면 다이얼로그를 닫는다.
+					initCheckSchedule();
 				}
 				db.close();
 			}
@@ -632,6 +689,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 		// 서비스 구동
 		super.onResume();
 		initCheckMemo();
+		initCheckSchedule();
 	}
 
 	/**
@@ -652,6 +710,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 			cal.add(Calendar.MONTH, -1);
 			setDate();
 			initCheckMemo();
+			initCheckSchedule();
 			switcher.showNext();
 			break;
 
@@ -659,6 +718,7 @@ public class MyDiaryActivity extends BaseActivity implements OnClickListener {
 			cal.add(Calendar.MONTH, 1);
 			setDate();
 			initCheckMemo();
+			initCheckSchedule();
 			switcher.showNext();
 			break;
 		case R.id.month:

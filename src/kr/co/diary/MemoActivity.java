@@ -21,7 +21,7 @@ import android.widget.Toast;
 /**
  *	메모 내용을 보여주는 엑티비티
  */
-public class MemoActivity extends BaseActivity implements OnClickListener {
+public class MemoActivity extends MyActivity implements OnClickListener {
 	private Calendar cal;				// 캘런더
 	private final Memo memo = new Memo();		// 메모 객체
 	// 엘리먼트

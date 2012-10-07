@@ -25,7 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MemoAllListActivity extends BaseActivity
+public class MemoAllListActivity extends MyActivity
 		implements IDiaryList {
 
 	private final ArrayList<Memo> list = new ArrayList<Memo>();

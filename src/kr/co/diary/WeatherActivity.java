@@ -38,11 +38,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * @author ddononi
- *
- */
-public class WeatherActivity extends BaseActivity {
+
+public class WeatherActivity extends MyActivity {
 	private TextView mCurrLocal;
 	private TextView mCurrTemp;
 	private TextView mCurrHumdity;
@@ -51,14 +48,15 @@ public class WeatherActivity extends BaseActivity {
 	private ListView mListView;
 	private Context mContext;
 
+	private String selectedLocal = "서울";
 	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.weather_layout);
 		mContext = this;
 		initLayout();
 
-		new LoadWeatherTask().execute("서울");
+		new LoadWeatherTask().execute("seoul");
 	}
 
 	/**
@@ -83,7 +81,8 @@ public class WeatherActivity extends BaseActivity {
 							public void onClick(final DialogInterface dialog,
 									final int which) {
 								// 지역선택후 해당 지역 날씨 정보 가져오기
-								String[] locals = mContext.getResources().getStringArray(R.array.local_list);
+								String[] locals = mContext.getResources().getStringArray(R.array.local_list_value);
+								selectedLocal =  mContext.getResources().getStringArray(R.array.local_list)[which]; 
 								new LoadWeatherTask().execute(locals[which]);
 							}
 						}).show();
@@ -100,9 +99,9 @@ public class WeatherActivity extends BaseActivity {
 			try {
 				data = requestWeatherData(params[0]);
 			} catch (IOException ioe){
-
+				Log.i(DEBUG_TAG , "" +ioe.getMessage());
 			} catch (Exception e) {
-				// TODO: handle exception
+				Log.i(DEBUG_TAG , "" +  e.getMessage());
 			}
 			return data;
 		}
@@ -148,9 +147,9 @@ public class WeatherActivity extends BaseActivity {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	public WeatherData requestWeatherData(final String local) throws IOException, SAXException, ParserConfigurationException {
+	public WeatherData requestWeatherData(String local) throws IOException, SAXException, ParserConfigurationException {
 		// 구글 날씨 api 조립
-		String weatherUrl  =GOOGLE_WEATHER_URL + URLEncoder.encode(local, "UTF-8");
+		String weatherUrl  =MSN_WEATHER_URL + URLEncoder.encode(local, "UTF-8");
 		URL url = new URL(weatherUrl);
 		URLConnection conn = url.openConnection();
 		// 연결시도 시간 설정
@@ -159,11 +158,10 @@ public class WeatherActivity extends BaseActivity {
 		StringBuilder sb = new StringBuilder();
 		// 한줄 단위로 가져올수 있게 bufferedReader 로 가져온다.
 		// 인코딩 euc-kr로 변환
-		BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream() , "EUC-KR"));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream() , "UTF-8"));
 		while((line = reader.readLine()) != null){
 			sb.append(line);
 		}
-
 		return parseXml(sb.toString());
 	}
 
@@ -176,8 +174,7 @@ public class WeatherActivity extends BaseActivity {
 	 * @throws ParserConfigurationException
 	 */
 	private WeatherData parseXml(final String xmlStr) throws SAXException, IOException, ParserConfigurationException {
-		Log.i("diary",  xmlStr);
-		WeatherData data =new WeatherData();
+		Log.i(DEBUG_TAG,  xmlStr);
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		InputStream is = new ByteArrayInputStream(xmlStr.getBytes());
@@ -187,35 +184,50 @@ public class WeatherActivity extends BaseActivity {
 		NodeList nodeList;
 		Node node;
 
-		nodeList = weather.getElementsByTagName("forecast_information");
-		node = nodeList.item(0).getFirstChild();
-		data.setLocal(node.getAttributes().getNamedItem("data").getNodeValue());	// 지역 가져오기
-		nodeList = weather.getElementsByTagName("current_conditions");
+		// 날씨 root
+		nodeList = weather.getElementsByTagName("weather");
+		// 첫번째 지역만 가져온다.
+		node = nodeList.item(0);
+		WeatherData data =new WeatherData();		
+		data.setLocal(selectedLocal);	// 지역 
 		NodeList currentCondiList = nodeList.item(0).getChildNodes();
 
 		// 날씨 가져오기
-		data.setCurrTemp("현재 기온 : " + currentCondiList.item(2).getAttributes().getNamedItem("data").getNodeValue() +"℃" );
+		data.setCurrTemp("현재 기온 : " + currentCondiList.item(0).getAttributes().getNamedItem("temperature").getNodeValue() +"℃" );
+		Log.i(DEBUG_TAG,  "현재기온: " +  data.getCurrTemp());			
 		// 습도 가져오기
-		data.setCurrHumidify( currentCondiList.item(3).getAttributes().getNamedItem("data").getNodeValue() );
+		data.setCurrHumidify( currentCondiList.item(0).getAttributes().getNamedItem("humidity").getNodeValue() );
+		Log.i(DEBUG_TAG,  "습도 : " +  data.getCurrTemp());			
 		// 이미지 가져오기
-		data.setCurrWeatherImgUrl(currentCondiList.item(4).getAttributes().getNamedItem("data").getNodeValue() );
-		mCurrCondImage.setImasgeUrl(GOOGLE_URL + data.getCurrWeatherImgUrl());
+		data.setCurrWeatherImgUrl(currentCondiList.item(0).getAttributes().getNamedItem("skycode").getNodeValue() );
+		Log.i(DEBUG_TAG,  "이미지 : " +  data.getCurrWeatherImgUrl());			
+		// 이미지 설정
+		mCurrCondImage.setImasgeUrl(MSN_WEATHER_IMAGE_URL + data.getCurrWeatherImgUrl() +  ".gif");
 		// 날씨상태
-		nodeList = weather.getElementsByTagName("forecast_conditions");
+
 		ArrayList<ForecastData> list = new ArrayList<ForecastData>();
-		for(int i =0; i<nodeList.getLength();  i++){
-			NodeList forecastItems = nodeList.item(i).getChildNodes();
+		// 마지막은 toobar이므로 제거 이다
+		int size = currentCondiList.getLength()-1;
+		for(int i =0; i< size;  i++){
+			// 첫번째는 현재 날씨이므로 넘어간다.
+			if(i == 0){
+				continue;
+			}
+			Node forecastItems = currentCondiList.item(i);
+			
 			ForecastData forecastData = new ForecastData();
+			//NamedNodeMap attrs = forecastItems.item(0).getAttributes();
 			// 요일 가져오기
-			forecastData.setDayOfWeek(forecastItems.item(0).getAttributes().getNamedItem("data").getNodeValue() );
+			forecastData.setDayOfWeek(forecastItems.getAttributes().getNamedItem("day").getNodeValue() );
+			Log.i(DEBUG_TAG,  "날짜: " +  forecastData.getDayOfWeek());				
 			// 최저기온 가져오기
-			forecastData.setLowTemp(forecastItems.item(1).getAttributes().getNamedItem("data").getNodeValue() );
+			forecastData.setLowTemp(forecastItems.getAttributes().getNamedItem("low").getNodeValue() );
 			// 최고기온 가져오기
-			forecastData.setHighTemp(forecastItems.item(2).getAttributes().getNamedItem("data").getNodeValue() );
+			forecastData.setHighTemp(forecastItems.getAttributes().getNamedItem("high").getNodeValue() );
 			// 날씨 이미지 가져오기
-			forecastData.setWeatherImgUrl(forecastItems.item(3).getAttributes().getNamedItem("data").getNodeValue() );
+			forecastData.setWeatherImgUrl(forecastItems.getAttributes().getNamedItem("skycodeday").getNodeValue() );
 			// 날씨  상태 가져오기
-			forecastData.setCondition(forecastItems.item(4).getAttributes().getNamedItem("data").getNodeValue() );
+			forecastData.setCondition(forecastItems.getAttributes().getNamedItem("skytextday").getNodeValue() );
 			// 리스트에 날씨 정보 담기
 			list.add(forecastData);
 		}

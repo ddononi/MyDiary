@@ -64,7 +64,7 @@ public class AlarmService extends Service {
 			return 0;
 		}
 
-		Log.i(BaseActivity.DEBUG_TAG,
+		Log.i(MyActivity.DEBUG_TAG,
 				"알람시간 : " + calendar.get(Calendar.HOUR_OF_DAY) + ":"
 						+ calendar.get(Calendar.MINUTE));
 
@@ -78,7 +78,7 @@ public class AlarmService extends Service {
 		sender = PendingIntent.getBroadcast(getBaseContext(), 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender); // 알람설정
-		Log.i(BaseActivity.PREFERENCE, "onstartCommand");
+		Log.i(MyActivity.PREFERENCE, "onstartCommand");
 
 		return 0;
 	}
@@ -87,7 +87,7 @@ public class AlarmService extends Service {
 	 * 알람 장소 리시버 설정
 	 */
 	private void checkProximity(){
-		Log.i(BaseActivity.DEBUG_TAG, "알람 갯수-------->" + list.size());
+		Log.i(MyActivity.DEBUG_TAG, "알람 갯수-------->" + list.size());
 		if (list.size() > 0) { // 알람이 설정된 위치로깅이 있으면 검색한다.
 			for (Logging l : list) { // 위치알람 리스트를 가져온다.
 				// 브로드케스트 리시버에 보낼 팬딩인텐트, 이전 팬딩인텐트가 있으면 취소하고 새로 실행
@@ -134,7 +134,7 @@ public class AlarmService extends Service {
 				l.setDate(cursor.getString(cursor.getColumnIndex("date")));
 				l.setTag(cursor.getString(cursor.getColumnIndex("tag")));
 				list.add(l); // arrayList 에 추가
-				Log.i(BaseActivity.DEBUG_TAG, "added alarm");
+				Log.i(MyActivity.DEBUG_TAG, "added alarm");
 			} while (cursor.moveToNext()); // 다음 커서로
 		}
 		// 디비를 닫아준다.
@@ -156,7 +156,7 @@ public class AlarmService extends Service {
 		// 현재 시간 가져오기
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		String date = sdf.format(cal.getTime());
-		Log.i(BaseActivity.DEBUG_TAG, "현재 시간--->" + date);
+		Log.i(MyActivity.DEBUG_TAG, "현재 시간--->" + date);
 		DBHelper dbhp = new DBHelper(this);
 		SQLiteDatabase db = dbhp.getReadableDatabase();
 		Cursor cursor = null;
@@ -171,7 +171,7 @@ public class AlarmService extends Service {
 		if (cursor.moveToFirst()) { // 가장 최신 한개만 가져온다.
 			date = cursor.getString(cursor.getColumnIndex("s_time"));
 			date = date.substring(0, 16);
-			Log.i(BaseActivity.DEBUG_TAG, "가져온 시간--->" + date);
+			Log.i(MyActivity.DEBUG_TAG, "가져온 시간--->" + date);
 		}
 		// 불러낸 데이터로 calendar 셋팅
 		try {
@@ -185,7 +185,7 @@ public class AlarmService extends Service {
 		db.close();
 		// 몇분전 알람시간 설정
 		cal.add(Calendar.MINUTE, -(beforeMin));
-		Log.i(BaseActivity.DEBUG_TAG, "알람 시간--->" + sdf.format(cal.getTime()));
+		Log.i(MyActivity.DEBUG_TAG, "알람 시간--->" + sdf.format(cal.getTime()));
 		return cal;
 	}
 
@@ -241,18 +241,18 @@ public class AlarmService extends Service {
 
 		@Override
 		public void onProviderDisabled(final String provider) {
-			Log.w(BaseActivity.DEBUG_TAG, "onProviderDisabled");
+			Log.w(MyActivity.DEBUG_TAG, "onProviderDisabled");
 		}
 
 		@Override
 		public void onProviderEnabled(final String provider) {
-			Log.w(BaseActivity.DEBUG_TAG, "onProviderEnabled");
+			Log.w(MyActivity.DEBUG_TAG, "onProviderEnabled");
 		}
 
 		@Override
 		public void onStatusChanged(final String provider, final int status,
 				final Bundle extras) {
-			Log.w(BaseActivity.DEBUG_TAG, "onStatusChanged");
+			Log.w(MyActivity.DEBUG_TAG, "onStatusChanged");
 		}
 	};
 
