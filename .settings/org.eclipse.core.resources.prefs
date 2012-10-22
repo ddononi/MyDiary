@@ -1,3 +1,4 @@
+#Mon Oct 22 13:46:21 KST 2012
 eclipse.preferences.version=1
 encoding//src/kr/co/diary/AlarmReceiver.java=UTF-8
 encoding//src/kr/co/diary/AlarmService.java=UTF-8
@@ -12,6 +13,7 @@ encoding//src/kr/co/diary/MemoAllListActivity.java=UTF-8
 encoding//src/kr/co/diary/MemoListActivity.java=UTF-8
 encoding//src/kr/co/diary/MyActivity.java=UTF-8
 encoding//src/kr/co/diary/MyDiaryActivity.java=UTF-8
+encoding//src/kr/co/diary/NoticeReceiver.java=UTF-8
 encoding//src/kr/co/diary/ScheduleAdapter.java=UTF-8
 encoding//src/kr/co/diary/ScheduleAllAdapter.java=UTF-8
 encoding//src/kr/co/diary/ScheduleAllListActivity.java=UTF-8

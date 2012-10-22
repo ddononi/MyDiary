@@ -50,7 +50,8 @@
 		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".map.RegMapActivity"></activity>
 
         <receiver android:name=".AlarmReceiver" />
-        <receiver android:name=".LoggingReceiver" />
+        <receiver android:name=".NoticeReceiver" />
+        <receiver android:name=".LoggingReceiver" />        
         <service android:name=".AlarmService"></service>  
         <!--  부팅시 처리할 리시버 -->   
 		<receiver android:name=".BootBroadCastReceiver">

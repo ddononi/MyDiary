@@ -54,6 +54,24 @@
 		<item>제주</item>
 	</string-array>
 	
+	<string-array name="notice_item_preference">
+		<item>6시</item>	    
+		<item>7시</item>
+		<item>8시</item>
+		<item>9시</item>
+		<item>10시</item>
+		<item>11시</item>
+	</string-array>	
+	
+	<string-array name="notice_list_preference">
+		<item>6</item>	    
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>10</item>
+		<item>11</item>
+	</string-array>
+	
 	<string-array name="local_list_value">
 		<item>seoul</item>
 		<item>gyeonggi</item>

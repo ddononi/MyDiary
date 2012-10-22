@@ -1,40 +1,35 @@
 package kr.co.diary;
 
-import kr.co.diary.data.Logging;
-import kr.co.diary.map.MapActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- * AlarmService 의 알람발생시 처리 리시버 클래스
+ * AlarmService 의 위치알람갯수 처리 리시버 클래스
  */
-public class LoggingReceiver extends BroadcastReceiver {
+public class NoticeReceiver extends BroadcastReceiver {
 	private final int YOURAPP_NOTIFICATION_ID = 1; // 앱 아이디값
 	private SharedPreferences sp; // 소리 및 진동 설정
-	private Logging logging;
-	private Context context;
 
+	private int alarmCount;
+
+	/**
+	 * 브로드 캐스팅 수신
+	 */
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
-		this.context = context;
-		Log.i("service", "broadcast catch!!");
-		logging = (Logging) intent.getSerializableExtra("alarmed_place");
-		// 위치 알람을 디비에서 제거한다.
-		removeAlarmedPlace(logging);
+		Log.i("service", "notice broadcast catch!!");
+		alarmCount = intent.getIntExtra("alarmCount", 1);
 		sp = PreferenceManager.getDefaultSharedPreferences(context); // 환경설정값
 																		// 가져오기
-		showNotification(R.drawable.ico_place); // 통지하기
-
+		showNotification(context, R.drawable.ico_place); // 통지하기
 	}
 
 	/**
@@ -44,20 +39,17 @@ public class LoggingReceiver extends BroadcastReceiver {
 	 * @param statusBarIconID
 	 *            상태바에 나타낼 아이콘
 	 */
-	private void showNotification(final int statusBarIconID) {
-		// MyScheduleActivity 로 엑티비티 설정
-
-		Intent contentIntent = new Intent(context, MapActivity.class);
-		// 지도화면에서 보여줄 위치를 설정
-		contentIntent.putExtra("lat", logging.getLat());
-		contentIntent.putExtra("lon", logging.getLon());
-
+	private void showNotification(final Context context,
+			final int statusBarIconID) {
+		// 통지바를 눌렀을경우 위치알람내역리스트 엑티비티로 이동하기 위한 설정
+		Intent contentIntent = new Intent(context, LoggingListActivity.class);
 		// 알림클릭시 이동할 엑티비티 설정
 		PendingIntent theappIntent = PendingIntent.getActivity(context, 0,
 				contentIntent, 0);
-		CharSequence title = "위치"; // 알림 타이틀
-		CharSequence message = "위치 알람" + logging.getTag(); // 알림 내용
+		CharSequence title = "위치 알림"; // 알림 타이틀
+		CharSequence message = "위치 알림이 " + alarmCount + "개 있습니다.";
 
+		// 통지바 설정
 		Notification notif = new Notification(statusBarIconID, null,
 				System.currentTimeMillis());
 
@@ -82,24 +74,5 @@ public class LoggingReceiver extends BroadcastReceiver {
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.notify(this.YOURAPP_NOTIFICATION_ID, notif); // 통지하기
-	}
-
-	/**
-	 * 알람이 발생된 위치를 디비에서 제거한다.
-	 * 
-	 * @param log
-	 *            위치알람 객체
-	 * @return 처리결과값 1 or 0
-	 */
-	private int removeAlarmedPlace(final Logging log) {
-		int result = -1;
-		DBHelper dbhp = new DBHelper(context);
-		SQLiteDatabase db = dbhp.getWritableDatabase();
-		ContentValues cv = new ContentValues();
-		// 인덱스 번호를 이용하여 alarm 값을 0으로 주어 알람 설정이 안되도록 한다.
-		result = db.delete(DBHelper.MY_PLACE_TABLE, "no = ?", new String[] { ""
-				+ log.getIdx(), });
-		db.close();
-		return result;
 	}
 }

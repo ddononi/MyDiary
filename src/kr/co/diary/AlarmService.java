@@ -35,13 +35,15 @@ public class AlarmService extends Service {
 	private final List<Logging> list = new ArrayList<Logging>();
 
 	private LocationManager locationManager;
+
+	private SharedPreferences defaultSharedPref;
+
 	/** 서비스가 실행될때 */
 	@Override
 	public int onStartCommand(final Intent intent, final int flags,
 			final int startId) {
 		// 공유환경 설정 가져오기 setting.xml 값
-		SharedPreferences defaultSharedPref = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		defaultSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		// 미리 알림 기본 시간 가져오기 , 없으면 10분으로 설정
 		int beforeMin = Integer.valueOf(defaultSharedPref.getString(
 				"beforeAlarm", "10")); // minus
@@ -86,13 +88,12 @@ public class AlarmService extends Service {
 	/**
 	 * 알람 장소 리시버 설정
 	 */
-	private void checkProximity(){
+	private void checkProximity() {
 		Log.i(MyActivity.DEBUG_TAG, "알람 갯수-------->" + list.size());
 		if (list.size() > 0) { // 알람이 설정된 위치로깅이 있으면 검색한다.
 			for (Logging l : list) { // 위치알람 리스트를 가져온다.
 				// 브로드케스트 리시버에 보낼 팬딩인텐트, 이전 팬딩인텐트가 있으면 취소하고 새로 실행
-				Intent i = new Intent(getBaseContext(),
-						LoggingReceiver.class);
+				Intent i = new Intent(getBaseContext(), LoggingReceiver.class);
 				Bundle bundle = new Bundle();
 				bundle.putSerializable("alarmed_place", l);
 				i.putExtras(bundle);
@@ -102,8 +103,38 @@ public class AlarmService extends Service {
 						PendingIntent.FLAG_CANCEL_CURRENT);
 				// 근접 알림 등록
 				// 위도, 경도, 지정한 위경도 중심으로 근접 알림 반경 지정 (미터 단위), 근접 알림 해제 시간
-				locationManager.addProximityAlert(l.getLat(), l.getLon(), alarmDistance, -1, sender);
+				locationManager.addProximityAlert(l.getLat(), l.getLon(),
+						alarmDistance, -1, sender);
 			}
+
+			// 위치 알람 갯수 알람 설정
+			// 하나라도 위치알람이 존재하면
+			// 현재 위치 알람이 몇개 설정되어 있는지 알람으로 알려준다.
+			// 시스템서비스에서 알람매니져를 얻어온다.
+			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+			// 브로드케스트 리시버에 보낼 팬딩인텐트, 이전 팬딩인텐트가 있으면 취소하고 새로 실행
+			Intent i = new Intent(getBaseContext(), NoticeReceiver.class);
+			// 알람 갯수도 보내준다.
+			i.putExtra("alarmCount", list.size());
+			Calendar cal = Calendar.getInstance();
+			// 기본은 10시로 설정해주자
+			int noticeAlarm = Integer.valueOf(defaultSharedPref.getString(
+					"noticeAlarm", "10"));
+			// 설정 시간이 지나면 그 다음 12시간 후로 설정하고
+			// 그렇지 않으면 설정시간으로 날짜 설정
+			if (cal.get(Calendar.HOUR_OF_DAY) > noticeAlarm
+					&& cal.get(Calendar.HOUR_OF_DAY) < noticeAlarm + 12) {
+				cal.set(Calendar.HOUR_OF_DAY, noticeAlarm + 12);
+			} else {
+				cal.set(Calendar.HOUR_OF_DAY, noticeAlarm);
+			}
+
+			// 팬딩 인텐트 설정
+			// 현재 팬딩 인텐트가 있으면 취소하고 다시 설정
+			PendingIntent sender = PendingIntent.getBroadcast(getBaseContext(),
+					0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+			am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), sender); // 알람설정
+			Log.i(MyActivity.PREFERENCE, "onstartCommand");
 		}
 	}
 
@@ -115,8 +146,8 @@ public class AlarmService extends Service {
 		SQLiteDatabase db = dbhp.getReadableDatabase();
 		Cursor cursor = null;
 		// 알람 설정이 되어 있는 row 만 가져온다.
-		cursor = db.query(DBHelper.MY_PLACE_TABLE, null, "alarm = ?", new String[]{"1", },
-				null, null, null);
+		cursor = db.query(DBHelper.MY_PLACE_TABLE, null, "alarm = ?",
+				new String[] { "1", }, null, null, null);
 		if (cursor.getCount() <= 0) { // 내역이 없으면 끝낸다.
 			dbhp.close();
 			return;
@@ -144,7 +175,7 @@ public class AlarmService extends Service {
 
 	/**
 	 * DB에서 가장 현재시간과 가까운 알람시간을 가져온다.
-	 *
+	 * 
 	 * @return
 	 */
 	private Calendar getAlarmDate(final int beforeMin) {
@@ -266,10 +297,10 @@ public class AlarmService extends Service {
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);// 정확도
 		criteria.setPowerRequirement(Criteria.POWER_HIGH); // 전원 소비량
-		criteria.setAltitudeRequired(false); 	// 고도 사용여부
-		criteria.setBearingRequired(false); 	// 방위 반환
-		criteria.setSpeedRequired(false); 	// 속도
-		criteria.setCostAllowed(true); 		// 금전적비용
+		criteria.setAltitudeRequired(false); // 고도 사용여부
+		criteria.setBearingRequired(false); // 방위 반환
+		criteria.setSpeedRequired(false); // 속도
+		criteria.setCostAllowed(true); // 금전적비용
 
 		String provider = locationManager.getBestProvider(criteria, true);
 		// 위치 업데이트 설정
@@ -284,11 +315,11 @@ public class AlarmService extends Service {
 		 * loclistener);// 현재정보를 업데이트 mLocation =
 		 * locationManager.getLastKnownLocation(provider); } else { // 없으면 null
 		 * mLocation = null; }
-		 *
+		 * 
 		 * if (mLocation == null) { // 무선 네크워트를 통한 위치 설정이 안되어 있으면 그냥 null 처리 if
 		 * (!(locationManager
 		 * .isProviderEnabled(LocationManager.NETWORK_PROVIDER))) { }
-		 *
+		 * 
 		 * // 네트워크로 위치를 가져옴 provider = LocationManager.NETWORK_PROVIDER; //
 		 * criteria.setAccuracy(Criteria.ACCURACY_COARSE); // provider =
 		 * locationManager.getBestProvider(criteria, true); mLocation =
@@ -304,7 +335,7 @@ public class AlarmService extends Service {
 
 	/**
 	 * 두지점간의 거리 구하기
-	 *
+	 * 
 	 * @param sLat
 	 * @param sLong
 	 * @param dLat

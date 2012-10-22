@@ -28,6 +28,14 @@
             android:summary="주변 반경에 들어오면 위치 알람 통보"
             android:title="발생간격" />
         
+        <ListPreference
+            android:dialogTitle="위치 알람내역 알람"
+            android:entries="@array/notice_item_preference"
+            android:entryValues="@array/notice_list_preference"
+            android:key="noticeAlarm"
+            android:summary="위치 알람내역 알람 시간 설정(매 12시간 단위로 알람)"
+            android:title="알람시간" />        
+        
     </PreferenceCategory>    
 
     <PreferenceCategory android:title="알람방식설정" >

@@ -6,7 +6,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import kr.co.diary.map.MapActivity;
 import kr.co.diary.map.RegMapActivity;
@@ -74,7 +73,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 	private TextView monthTV; // 상단 월 텍스트
 	private ProgressBar loadingBar; // 날씨에 보여줄 로딩바
 	private ViewSwitcher switcher; // 상단 월 에니메이션을 위한 뷰 스위쳐
-	private View preBtn;			// 이전 선택 버튼
+	private View preBtn; // 이전 선택 버튼
 
 	// animation
 	private Animation ani; // 버튼 에니메이션
@@ -135,10 +134,10 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 		nextBtn.setOnClickListener(this);
 		swticherMonthTV.setOnClickListener(this);
 
-		initElem();					 // 날짜 table 설정
-		setDate();					 // 날짜 설정
-		initCheckMemo(); 		 // 메모 체크
-		initCheckSchedule();		 // 일정 체크
+		initElem(); // 날짜 table 설정
+		setDate(); // 날짜 설정
+		initCheckMemo(); // 메모 체크
+		initCheckSchedule(); // 일정 체크
 		ani = AnimationUtils.loadAnimation(this, R.anim.alpha); // 날씨 정보 가져오기
 		AsyncTaskWeather asyncWeather = new AsyncTaskWeather();
 		asyncWeather.execute();
@@ -162,7 +161,6 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 		}
 
 	}
-
 
 	/**
 	 * 달력 생성 및 초기화
@@ -202,12 +200,13 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 					 */
 					@Override
 					public void onClick(final View v) {
-						v.setBackgroundColor(R.color.select);
+						// v.setBackgroundColor(R.color.select);
 						// 이전 버튼 포커스 제거
-						if(preBtn != null){
-							if(preBtn.getTag() != null){
-								preBtn.setBackgroundResource((Integer)preBtn.getTag());
-							}else{
+						if (preBtn != null) {
+							if (preBtn.getTag() != null) {
+								preBtn.setBackgroundResource((Integer) preBtn
+										.getTag());
+							} else {
 								preBtn.setBackgroundResource(R.drawable.selector);
 							}
 						}
@@ -242,6 +241,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 
 	/**
 	 * 날짜 선택시 선택 다이얼로그 띄우기
+	 * 
 	 * @param weekIndex
 	 * @param day
 	 */
@@ -253,7 +253,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 								+ day + "일 " + dayWeek[weekIndex] + "요일")
 				// 메뉴 항목
 				.setItems(R.array.todo_item,
-						// 다이얼로그 메뉴 선택시
+				// 다이얼로그 메뉴 선택시
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(final DialogInterface dialog,
@@ -291,7 +291,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 									intent = new Intent(MyDiaryActivity.this,
 											ScheduleAllListActivity.class);
 									startActivity(intent);
-									break;									
+									break;
 								case 6: // 녹음 하기
 									RecordDialog recordDailog = new RecordDialog(
 											MyDiaryActivity.this);
@@ -408,7 +408,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 		db.close();
 
 	}
-	
+
 	/**
 	 * 메모날짜를 체크해 달력에 색 강조해 주기
 	 */
@@ -421,25 +421,28 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 				+ String.format("%02d", cal.get(Calendar.MONTH) + 1);
 		Log.i(DEBUG_TAG, "scheduleDate-->" + date);
 		String scheduleDate;
-		cursor = db.query(DBHelper.SCHEDULE_TABLE, null, "substr(yyyyMMdd, 1,7) = ? ",
-				new String[] { date, }, null, null, null);
+		cursor = db.query(DBHelper.SCHEDULE_TABLE, null,
+				"substr(yyyyMMdd, 1,7) = ? ", new String[] { date, }, null,
+				null, null);
 		if (cursor.moveToFirst()) {
 			do {
-				scheduleDate = cursor.getString(cursor.getColumnIndex("yyyyMMdd"));
+				scheduleDate = cursor.getString(cursor
+						.getColumnIndex("yyyyMMdd"));
 				// list에 추가
 				String[] arr = scheduleDate.substring(0, 10).split("-");
 				scheduleDate = arr[2]; // 메모한 날짜 뱨오기
 				Log.i(DEBUG_TAG, "schedule~~~~~~" + arr[2]);
 				// 오늘날짜는 뺴고
-				if (Integer.valueOf(scheduleDate) == cal.get(Calendar.DAY_OF_MONTH)) {
+				if (Integer.valueOf(scheduleDate) == cal
+						.get(Calendar.DAY_OF_MONTH)) {
 					continue;
 				}
 				int searchDay = Integer.valueOf(scheduleDate);
 				for (Button btn : list) {
-					Log.i(DEBUG_TAG, "schedulz22222zzz");			
+					Log.i(DEBUG_TAG, "schedulz22222zzz");
 					// 메모가 있으면 색강조
 					if (btn.getText().toString().length() > 0) { // 날짜가 있는 버튼만
-						Log.i(DEBUG_TAG, "schedulzzzz");						
+						Log.i(DEBUG_TAG, "schedulzzzz");
 						if (Integer.valueOf(btn.getText().toString()) == searchDay) {
 							Log.i(DEBUG_TAG, "scheduleDate day-->" + searchDay);
 							btn.setBackgroundResource(R.drawable.has_schedule_selector);
@@ -453,7 +456,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 		cursor.close();
 		db.close();
 
-	}	
+	}
 
 	/**
 	 * 년(year) 선택 다이얼로그
@@ -530,11 +533,11 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 						.getCurrentMinute();
 				ToggleButton tb = (ToggleButton) sv.findViewById(R.id.alarm);
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				Calendar cal  = Calendar.getInstance();
-	            cal.set(Calendar.YEAR, selectedDay[0]);
-	            cal.set(Calendar.MONTH, selectedDay[1]) ;
-	            cal.set(Calendar.DAY_OF_MONTH, selectedDay[2]);			
-	            
+				Calendar cal = Calendar.getInstance();
+				cal.set(Calendar.YEAR, selectedDay[0]);
+				cal.set(Calendar.MONTH, selectedDay[1]);
+				cal.set(Calendar.DAY_OF_MONTH, selectedDay[2]);
+
 				String date = sdf.format(cal.getTime());
 				String startTime = date
 						+ String.format("-%02d %02d:%02d",
@@ -544,8 +547,8 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 						+ String.format("-%02d %02d:%02d",
 								Integer.valueOf(day), endHour, endMin); // 종료 시간
 				int alarm = tb.isChecked() ? 1 : 0;
-	
-				cv.put("yyyyMMdd", sdf.format(cal.getTime()));				
+
+				cv.put("yyyyMMdd", sdf.format(cal.getTime()));
 				cv.put("todo", schedule);
 				cv.put("s_time", startTime);
 				cv.put("e_time", endTime);
@@ -623,7 +626,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 
 	/**
 	 * 현재 위치를 폰의 위치 수신상태따라 gps>wifi>network 순으로 가져온다.
-	 *
+	 * 
 	 * @param msgFlag
 	 * @return 위치 좌표 double[]
 	 */
@@ -746,72 +749,69 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 		return null;
 	}
 
-    /** 옵션 메뉴 만들기 */
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu){
-    	super.onCreateOptionsMenu(menu);
-    	menu.add(0,1,0, "현재위치로깅");
-    	menu.add(0,2,0, "지도위치로깅");
-    	menu.add(0,3,0, "로깅지도보기");
-    	menu.add(0,4,0, "로깅내역");
-    	menu.add(0,5,0, "날씨보기");
-    	menu.add(0,6,0, "설정");
+	/** 옵션 메뉴 만들기 */
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		menu.add(0, 1, 0, "현재위치로깅");
+		menu.add(0, 2, 0, "지도위치로깅");
+		menu.add(0, 3, 0, "지도");
+		menu.add(0, 4, 0, "로깅내역");
+		menu.add(0, 5, 0, "날씨");
+		menu.add(0, 6, 0, "설정");
 
-    	//menu.add(0,4,0, "도움말");
-    	//item.setIcon();
-    	return true;
-    }
+		// menu.add(0,4,0, "도움말");
+		// item.setIcon();
+		return true;
+	}
 
-    /** 옵션 메뉴 선택에 따라 해당 처리를 해줌 */
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item){
-    	Intent intent = null;
-    	switch(item.getItemId()){
-	    	case 1:	// 내 위치 추가
-	    		addMyPlace();
-	    		break;
-	    	case 2:	// 지도에서 위치 추가
-	    		intent = new Intent(MyDiaryActivity.this,
-	    				RegMapActivity.class);
-	    		double[] geo = getLocation();
-	    		if(geo !=null){	// 현재좌표가 있으면 인텐트에 싣는다.
-		    		intent.putExtra("lat", geo[0]);
-		    		intent.putExtra("lon", geo[1]);
-	    		}
-	    		startActivity(intent);
-	    		break;
-	    	case 3:	// 내 위치 로깅 내역 지도  보기
-	    		intent =new Intent(MyDiaryActivity.this,
-	    				MapActivity.class);
-	    		geo = getLocation();
-	    		if(geo !=null){	// 현재좌표가 있으면 인텐트에 싣는다.
-		    		intent.putExtra("lat", geo[0]);
-		    		intent.putExtra("lon", geo[1]);
-	    		}
-	    		startActivity(intent);
-	    		break;
-    		case 4:		// 로깅내역들 보기
-				intent = new Intent(getBaseContext(), LoggingListActivity.class);
-				startActivity(intent);
-				return true;
-    		case 5:		// 날씨보기
-				intent = new Intent(getBaseContext(), WeatherActivity.class);
-				startActivity(intent);
-				return true;
-    		case 6:		// 설정 프리퍼런스엑티비티
-				intent = new Intent(getBaseContext(), SettingActivity.class);
-				startActivity(intent);
-				return true;
-				/*
-			case 5:		// 도움말 액티비티로 이동
-				intent = new Intent(getBaseContext(), HelpActivity.class);
-				startActivity(intent);	// 특별한 요청코드는 필요없음
-				return true;
-				*/
+	/** 옵션 메뉴 선택에 따라 해당 처리를 해줌 */
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		Intent intent = null;
+		switch (item.getItemId()) {
+		case 1: // 내 위치 추가
+			addMyPlace();
+			break;
+		case 2: // 지도에서 위치 추가
+			intent = new Intent(MyDiaryActivity.this, RegMapActivity.class);
+			double[] geo = getLocation();
+			if (geo != null) { // 현재좌표가 있으면 인텐트에 싣는다.
+				intent.putExtra("lat", geo[0]);
+				intent.putExtra("lon", geo[1]);
+			}
+			startActivity(intent);
+			break;
+		case 3: // 내 위치 로깅 내역 지도 보기
+			intent = new Intent(MyDiaryActivity.this, MapActivity.class);
+			geo = getLocation();
+			if (geo != null) { // 현재좌표가 있으면 인텐트에 싣는다.
+				intent.putExtra("lat", geo[0]);
+				intent.putExtra("lon", geo[1]);
+			}
+			startActivity(intent);
+			break;
+		case 4: // 로깅내역들 보기
+			intent = new Intent(getBaseContext(), LoggingListActivity.class);
+			startActivity(intent);
+			return true;
+		case 5: // 날씨보기
+			intent = new Intent(getBaseContext(), WeatherActivity.class);
+			startActivity(intent);
+			return true;
+		case 6: // 설정 프리퍼런스엑티비티
+			intent = new Intent(getBaseContext(), SettingActivity.class);
+			startActivity(intent);
+			return true;
+			/*
+			 * case 5: // 도움말 액티비티로 이동 intent = new Intent(getBaseContext(),
+			 * HelpActivity.class); startActivity(intent); // 특별한 요청코드는 필요없음
+			 * return true;
+			 */
 
-    	}
-    	return false;
-    }
+		}
+		return false;
+	}
 
 	@Override
 	protected void onStop() {
@@ -829,7 +829,7 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 
 	/**
 	 * 종료 confirm 다이얼로그 창
-	 *
+	 * 
 	 * @param context
 	 */
 	public void finishDialog(final Context context) {
