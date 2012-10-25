@@ -540,12 +540,10 @@ public class MyDiaryActivity extends MyActivity implements OnClickListener {
 
 				String date = sdf.format(cal.getTime());
 				String startTime = date
-						+ String.format("-%02d %02d:%02d",
-								Integer.valueOf(day), startHour, startMin); // 시작
+						+ String.format(" %02d:%02d", startHour, startMin); // 시작
 																			// 시간
 				String endTime = date
-						+ String.format("-%02d %02d:%02d",
-								Integer.valueOf(day), endHour, endMin); // 종료 시간
+						+ String.format(" %02d:%02d", endHour, endMin); // 종료 시간
 				int alarm = tb.isChecked() ? 1 : 0;
 
 				cv.put("yyyyMMdd", sdf.format(cal.getTime()));

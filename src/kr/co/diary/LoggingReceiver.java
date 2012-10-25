@@ -6,7 +6,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -95,10 +94,9 @@ public class LoggingReceiver extends BroadcastReceiver {
 		int result = -1;
 		DBHelper dbhp = new DBHelper(context);
 		SQLiteDatabase db = dbhp.getWritableDatabase();
-		ContentValues cv = new ContentValues();
 		// 인덱스 번호를 이용하여 alarm 값을 0으로 주어 알람 설정이 안되도록 한다.
-		result = db.delete(DBHelper.MY_PLACE_TABLE, "no = ?", new String[] { ""
-				+ log.getIdx(), });
+		result = db.delete(DBHelper.MY_PLACE_TABLE, "no = ?",
+				new String[] { log.getIdx() + "", });
 		db.close();
 		return result;
 	}

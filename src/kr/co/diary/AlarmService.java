@@ -33,7 +33,7 @@ public class AlarmService extends Service {
 	private PendingIntent sender; // 알람 notification을 위한 팬딩인텐트
 	private int alarmDistance; // 알람 발생 간격 미터
 	private final List<Logging> list = new ArrayList<Logging>();
-
+	private int alarmIdx; // 발생된 알람인덱스
 	private LocationManager locationManager;
 
 	private SharedPreferences defaultSharedPref;
@@ -75,6 +75,7 @@ public class AlarmService extends Service {
 		// 브로드케스트 리시버에 보낼 팬딩인텐트, 이전 팬딩인텐트가 있으면 취소하고 새로 실행
 		Intent i = new Intent(getBaseContext(), AlarmReceiver.class);
 		i.putExtra("beforeMin", beforeMin);
+		i.putExtra("alarmIdx", alarmIdx);
 		// 팬딩 인텐트 설정
 		// 현재 팬딩 인텐트가 있으면 취소하고 다시 설정
 		sender = PendingIntent.getBroadcast(getBaseContext(), 0, i,
@@ -125,8 +126,10 @@ public class AlarmService extends Service {
 			if (cal.get(Calendar.HOUR_OF_DAY) > noticeAlarm
 					&& cal.get(Calendar.HOUR_OF_DAY) < noticeAlarm + 12) {
 				cal.set(Calendar.HOUR_OF_DAY, noticeAlarm + 12);
+
 			} else {
 				cal.set(Calendar.HOUR_OF_DAY, noticeAlarm);
+
 			}
 
 			// 팬딩 인텐트 설정
@@ -182,8 +185,6 @@ public class AlarmService extends Service {
 		Calendar cal = Calendar.getInstance();
 		// 단말기의 시간을 가져온다.
 		cal.setTimeInMillis(System.currentTimeMillis());
-		// 몇분전 알람시간 설정
-		cal.add(Calendar.MINUTE, beforeMin);
 		// 현재 시간 가져오기
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		String date = sdf.format(cal.getTime());
@@ -201,8 +202,12 @@ public class AlarmService extends Service {
 		}
 		if (cursor.moveToFirst()) { // 가장 최신 한개만 가져온다.
 			date = cursor.getString(cursor.getColumnIndex("s_time"));
-			date = date.substring(0, 16);
+			alarmIdx = cursor.getInt(cursor.getColumnIndex("no"));
+			// date = date.substring(0, 16);
 			Log.i(MyActivity.DEBUG_TAG, "가져온 시간--->" + date);
+			if (date == null) {
+				return null;
+			}
 		}
 		// 불러낸 데이터로 calendar 셋팅
 		try {
@@ -210,6 +215,7 @@ public class AlarmService extends Service {
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		// 디비를 닫아준다.
 		cursor.close();

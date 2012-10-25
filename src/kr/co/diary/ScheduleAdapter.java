@@ -12,10 +12,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- *	일정 리스트에 설정할 어댑터 클래스
+ * 일정 리스트에 설정할 어댑터 클래스
  */
 public class ScheduleAdapter extends BaseAdapter {
 	private final ArrayList<?> list;
+
 	public ScheduleAdapter(final ArrayList<?> list) {
 		this.list = list;
 	}
@@ -41,26 +42,29 @@ public class ScheduleAdapter extends BaseAdapter {
 
 	/** list 의 각 view 설정 */
 	@Override
-	public View getView(final int position, final View convertView, final ViewGroup parent) {
+	public View getView(final int position, final View convertView,
+			final ViewGroup parent) {
 		// TODO Auto-generated method stub
 		ViewGroup item = getViewGroup(convertView, parent);
-		 Schedule sche = (Schedule)getItem(position);
+		Schedule sche = (Schedule) getItem(position);
 		// 엘리먼트 후킹
-		TextView timeTV = (TextView)item.findViewById(R.id.time);
-		TextView itemTV = (TextView)item.findViewById(R.id.todo);
-		ImageView imageIV = (ImageView)item.findViewById(R.id.alarm_img);
+		TextView timeTV = (TextView) item.findViewById(R.id.time);
+		TextView itemTV = (TextView) item.findViewById(R.id.todo);
+		ImageView imageIV = (ImageView) item.findViewById(R.id.alarm_img);
 		// 엘리먼트에 값을 set해준다,
-		timeTV.setText(sche.getStartTime().substring(14) + " ~ "+ sche.getEndTime().substring(14));
+		timeTV.setText(sche.getStartTime().substring(11) + " ~ "
+				+ sche.getEndTime().substring(11));
 		itemTV.setText(sche.getTodo());
-		if(sche.getAlarm()==1){	// 알람이 설정되어 있으면 아이콘을 보여준다.
+		if (sche.getAlarm() == 1) { // 알람이 설정되어 있으면 아이콘을 보여준다.
 			imageIV.setVisibility(View.VISIBLE);
-		};
+		}
+		;
 		return item;
 	}
 
 	/**
 	 * 뷰의 재사용 체크후 custom list로 뷰 반환
-	 *
+	 * 
 	 * @param reuse
 	 *            변환될 뷰
 	 * @param parent
@@ -75,7 +79,8 @@ public class ScheduleAdapter extends BaseAdapter {
 		Context context = parent.getContext(); // 부모뷰로부터 컨택스트를 얻어온다.
 		LayoutInflater inflater = LayoutInflater.from(context);
 		// custom list를 위해 인플레이터로 뷰를 가져온다
-		ViewGroup item = (ViewGroup) inflater.inflate(R.layout.schedule_custom_list, null);
+		ViewGroup item = (ViewGroup) inflater.inflate(
+				R.layout.schedule_custom_list, null);
 		return item;
 	}
 
