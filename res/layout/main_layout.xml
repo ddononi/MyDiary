@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/bgboard"
+    android:background="@drawable/white"
     android:orientation="vertical" >
 
     <!-- 월 및 이전, 다음월 -->
@@ -160,7 +160,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
-			android:textColor="#f7f3f7"
+			android:textColor="#000"
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
@@ -192,6 +192,7 @@
 	        android:layout_marginTop="10px"
 	        android:layout_height="wrap_content" >
 		    <TextView
+				android:textColor="#000"		        
 		        android:id="@+id/weather_info"
 		        android:layout_width="fill_parent"
 		        android:layout_marginLeft="20px"

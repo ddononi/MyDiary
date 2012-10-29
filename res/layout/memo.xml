@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bgboard"
+    android:background="@drawable/green"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical" >
 
     <TextView
+        android:layout_marginTop="50dp"
         android:id="@+id/date"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -14,13 +15,13 @@
         android:paddingBottom="7dp"
         android:paddingLeft="40dp"
         android:paddingTop="7dp"
-        android:shadowColor="#333333"
+        android:shadowColor="#cccccc"
+        android:textColor="#fff"
         android:shadowDx="1"
         android:shadowDy="1"
         android:shadowRadius="1"
         android:text="날짜 : "
-        android:textAppearance="?android:attr/textAppearanceMediumInverse"
-        android:textColor="#111111" />
+        android:textAppearance="?android:attr/textAppearanceMediumInverse"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"
